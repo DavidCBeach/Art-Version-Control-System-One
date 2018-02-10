@@ -29,8 +29,7 @@
          
     }
      for ($i = 0; $i < count($files) - 2; $i++) {
-             echo "<img id='". $files[$i] ."' src='gallery/" .   $files[$i] . "' width='50' class='pic' >";
-              
+             echo "<a id='". $files[$i] ."'  width='50' class='pic' >" .   $files[$i] ."</a>";
         }
   
   
