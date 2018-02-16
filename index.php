@@ -6,7 +6,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     </head>
     <body>
-         <h2 class="title"> Photo Gallery </h2>
+         <h2 class="title"> AVCS </h2>
     <form method="POST" enctype="multipart/form-data"> 
 
 
@@ -16,41 +16,44 @@
 
     </form>
 <?php
-
+    $files = scandir("gallery/");
     if($_FILES["myFile"]['size'] > 1000000)
     {
         echo "FILE IS TOO LARGE";
     } else{
-        move_uploaded_file($_FILES["myFile"]["tmp_name"], "gallery/" . $_FILES["myFile"]["name"] );
+        $flag = true;
+        for ($i = count($files); $i > 1; $i--) 
+        {
+            print($files[$i]);
+            if(substr($files[$i],strpos($files[$i],']')+1)==$_FILES["myFile"]["name"])
+            {
+                print_r(substr($files[$i],1,strpos($files[$i],']')-1));
+                $flag = false;
+                $inter = (int)substr($files[$i],1,strpos($files[$i],']')-1);
+                move_uploaded_file($_FILES["myFile"]["tmp_name"], "gallery/[".($inter+1)."]" . $_FILES["myFile"]["name"] );
+                break;
+            }
+        }
+        if($flag)
+        {
+            move_uploaded_file($_FILES["myFile"]["tmp_name"], "gallery/[0]" . $_FILES["myFile"]["name"] );
+        }
+        
   
-          $files = scandir("gallery/", 1);
+        $files = scandir("gallery/", 1);
         
           
          
     }
-     for ($i = 0; $i < count($files) - 2; $i++) {
-             echo "<a id='". $files[$i] ."'  width='50' class='pic' >" .   $files[$i] ."</a>";
+     for ($i = 0; $i < count($files) - 2; $i++) 
+     {
+             echo "<p id='". $files[$i] ."'  width='50' class='pic' >" .   $files[$i] ."</p>";
         }
   
   
   
 
 ?>
-<script>
-        function expand(ims)
-        {
-            if($(ims).css('width')=='250px')
-            {
-                $(ims).css('width','50px');
-                return;
-            }
-            $(ims).css('width','250px');
-            
-        }
-            $("img").click(function(){
-                console.log("wow");
-                expand(this);
-            });
-        </script>
+
     </body>
 </html>
