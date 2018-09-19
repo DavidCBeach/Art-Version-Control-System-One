@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<head>
+	<script src="jquery-3.3.1.min.js"></script>	
+	<title>AVCS1</title>
+</head>
+<body>
+	<h1>AVCS1</h1>
+	<fieldset>
+		<input type="file" id="thefile" name="thefile" >
+		<button id = "submitter" type = "submit">Submit</button>
+	</fieldset>
+	
+	<script>
+		var input = document.querySelector('#submit');	
+		
+		$("#submitter").click( function(){
+			console.log("saving file")
+			var filename = $("#thefile").val();
+			saveAs(file,"/storage/"+file);
+		});
+
+	</script>
+
+</body>
+
+
