@@ -2,23 +2,27 @@
 
 <head>
 	<script src="jquery-3.3.1.min.js"></script>	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<title>AVCS1</title>
 </head>
 <body>
 	<h1>AVCS1</h1>
+	<form enctype="multipart/form-data" action="/upload/image" method="post">
+    <input id="image-file" type="file" />
+		<button onclick = "submitClick()" id = "submitter2" type = "submit">Submit</button>
+</form>
 	<fieldset>
 		<input type="file" id="thefile" name="thefile" >
-		<button id = "submitter" type = "submit">Submit</button>
+		<button onclick = "submitClick()" id = "submitter" type = "submit">Submit</button>
 	</fieldset>
 	
 	<script>
 		var input = document.querySelector('#submit');	
 		
-		$("#submitter").click( function(){
-			console.log("saving file")
+		function submitClick(){
+			console.log("saving file");
 			var filename = $("#thefile").val();
-			saveAs(file,"/storage/"+file);
-		});
+		}
 
 	</script>
 
