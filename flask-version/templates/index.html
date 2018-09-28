@@ -7,14 +7,14 @@
 </head>
 <body>
 	<h1>AVCS1</h1>
-	<form enctype="multipart/form-data" action="/upload/image" method="post">
-    <input id="image-file" type="file" />
-		<button onclick = "submitClick()" id = "submitter2" type = "submit">Submit</button>
-</form>
-	<fieldset>
-		<input type="file" id="thefile" name="thefile" >
-		<button onclick = "submitClick()" id = "submitter" type = "submit">Submit</button>
-	</fieldset>
+    <form method="POST" action="savefile.php" nctype="multipart/form-data">
+
+
+        <input type="file" name="myFile" />
+
+        <input id ="submit"type="submit" value="Upload File!" />
+
+    </form>
 	
 	<script>
 		var input = document.querySelector('#submit');	
