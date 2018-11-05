@@ -7,7 +7,7 @@ var app = require("express")();
 var express = require("express");
 var app = express();
 
-app.use('/files', express.static('public'));
+app.use('/static', express.static('public'))
 
 const sqlite3 = require("sqlite3").verbose();
 
