@@ -13,7 +13,7 @@ const sqlite3 = require("sqlite3").verbose();
 
 http.createServer(function (req, res) {
   var fileReader = function(filename){
-    filename = "./files/templates" + filename;
+    filename = "./templates" + filename;
     fs.readFile(filename, function(err, data) {
 
     if (err) {

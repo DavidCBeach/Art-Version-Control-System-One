@@ -48,7 +48,7 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
 var fileReader = function(filename,req,res){
-    filename = "./public/files/templates" + filename;
+    filename = "./templates" + filename;
     fs.readFile(filename, function(err, data) {
 
     if (err) {
