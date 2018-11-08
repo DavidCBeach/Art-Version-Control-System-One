@@ -1,0 +1,24 @@
+<head>
+   <meta charset="UTF-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+<a href = "home.html">HOME</a>
+<ul>
+  </ul>
+</body>
+<script>
+console.log("running");
+$.ajax({
+  url: '/getfiles',
+  complete: function(data) {
+    var filenames = data["responseJSON"]["files"];
+    for(i = 0; i < filenames.length;i++){
+      if(filenames[i].includes(".png") || filenames[i].includes(".jpg")){
+        $("ul").append("<li><img src='/files/"+filenames[i]+"' height='300' width='auto'></li>");
+      }
+    }
+  }
+});
+</script>
