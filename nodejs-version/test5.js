@@ -6,10 +6,13 @@ var fs = require('fs');
 var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 
-//!(filename.includes("files"))
+
 const hostname = '127.0.0.1';
 const port = 3000;
 
+//TODO: for file compare read in all pixel info and compare between versions
+//if there is difference color with highlight effect
+//then show modified image to show changes in files
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm();
