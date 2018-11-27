@@ -5,7 +5,7 @@ var url = require('url');
 var fs = require('fs');
 var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
-
+const sqlite3 = require("sqlite3").verbose();
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -39,6 +39,23 @@ app.get('/getfiles', (req, res) => {
 
 });
 
+app.get('/sqltest', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+  db.serialize(() => {
+    db.each(`select * from files`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row.id + "\t" + row.name);
+  });
+  });
+});
 
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
@@ -47,6 +64,12 @@ app.get('/*', (req, res) => {
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+
+var sqlAdd = function(filename){
+  
+
+}
 
 
 
