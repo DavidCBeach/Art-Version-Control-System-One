@@ -19,6 +19,7 @@ app.post('/fileupload', (req, res) => {
   form.parse(req, function (err, fields, files) {
     var oldpath = files.filetoupload.path;
     var newpath = './public/files/' + files.filetoupload.name;
+    sqlAdd(files.filetoupload.name);
     fs.rename(oldpath, newpath, function (err) {
       if (err) throw err;
       fileReader("/home.html",req,res);
@@ -67,7 +68,33 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
 var sqlAdd = function(filename){
-  
+  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+
+  var filenameParts = filename.split('.');
+  var length = filenameParts.length;
+  var extension = filenameParts[length-1];
+  filenameParts.length = length - 1;
+  var name = filenameParts.join('.');
+  console.log(name, extension);
+  db.serialize(() => {
+    db.each(`select id from files where name = '`+name+`' and extension = `+extension,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     if(row){
+       console.log(row.id );
+     } else {
+       console.log("new file");
+     }
+
+  });
+  });
 
 }
 
