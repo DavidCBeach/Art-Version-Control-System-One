@@ -53,7 +53,7 @@ app.get('/sqltest', (req, res) => {
      if (err) {
        console.error(err.message);
      }
-     console.log(row.id + "\t" + row.name);
+     console.log(row);
   });
   });
 });
@@ -68,6 +68,7 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
 var sqlAdd = function(filename){
+
   let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
     if (err) {
       return console.error(err.message);
@@ -80,25 +81,41 @@ var sqlAdd = function(filename){
   var extension = filenameParts[length-1];
   filenameParts.length = length - 1;
   var name = filenameParts.join('.');
-  console.log(name, extension);
-  db.serialize(() => {
-    db.each(`select id from files where name = '`+name+`' and extension = `+extension,
+  //console.log(name, extension);
+  console.log("1");
+  name = 'taco';
+  extension = 'bred';
+  //TODO: input each file upload as new row and make get get the largest version of file to make the
+  // new row the next version. also file might be put into a folder with file name as folder name
+  // and each file named the version number 
+  if(sqlGet(db, name, extension)){
+    sqlInsert(db,name,extension);
+  }
+}
+var sqlGet = function (db, name, extension){
+  db.get(`select * from files where name = ? and extension = ?`,[name,extension],
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
-     if(row){
-       console.log(row.id );
-     } else {
-       console.log("new file");
-     }
-
+     console.log("2");
+     console.log("old file",row.id);
+     return false;
   });
-  });
-
+  return true;
 }
-
-
+var sqlInsert = function(db,name,extension){
+  console.log("3");
+    console.log("new file");
+    db.run(`INSERT INTO files(name,extension,version) VALUES(?,?,0)`, [name,extension], function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
+      // get the last insert id
+      console.log("4");
+      console.log(`A row has been inserted with rowid ${this.lastID}`);
+    });
+}
 
 var fileReader = function(filename,req,res){
     filename = "./templates" + filename;
