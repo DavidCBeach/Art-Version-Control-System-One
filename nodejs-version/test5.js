@@ -20,6 +20,7 @@ app.post('/fileupload', (req, res) => {
   form.parse(req, function (err, fields, files) {
     var oldpath = files.filetoupload.path;
     var newpath = './public/files/' + files.filetoupload.name;
+    sqlAdd(files.filetoupload.name);
     fs.rename(oldpath, newpath, function (err) {
       if (err) throw err;
       fileReader("/home.html",req,res);
@@ -60,6 +61,22 @@ app.get('/getfiles', (req, res) => {
 
 });
 
+app.get('/sqltest', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from files`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files: row})
+  });
+});
 
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
@@ -70,6 +87,43 @@ app.get('/*', (req, res) => {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
+var sqlAdd = function(filename){
+
+  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+
+  var filenameParts = filename.split('.');
+  var length = filenameParts.length;
+  var extension = filenameParts[length-1];
+  filenameParts.length = length - 1;
+  var name = filenameParts.join('.');
+  //TODO: input each file upload as new row and make get get the largest version of file to make the
+  // new row the next version. also file might be put into a folder with file name as folder name
+  // and each file named the version number
+  sqlInsert(db,name,extension);
+}
+
+var sqlInsert = function(db,name,extension){
+  db.get(`select * from files where name = ? and extension = ? order by version desc`,[name,extension],
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     var version = 0;
+     if(row){
+        version = row.version + 1;
+     }
+    db.run(`INSERT INTO files(name,extension,version) VALUES(?,?,?)`, [name,extension,version], function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
+    });
+  });
+}
 
 var fileReader = function(filename,req,res){
     filename = "./templates" + filename;
