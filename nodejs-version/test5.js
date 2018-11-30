@@ -47,14 +47,13 @@ app.get('/sqltest', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-  db.serialize(() => {
-    db.each(`select * from files`,
+    db.all(`select * from files`,
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
      console.log(row);
-  });
+     res.json({files: row})
   });
 });
 
@@ -81,40 +80,28 @@ var sqlAdd = function(filename){
   var extension = filenameParts[length-1];
   filenameParts.length = length - 1;
   var name = filenameParts.join('.');
-  //console.log(name, extension);
-  console.log("1");
-  name = 'taco';
-  extension = 'bred';
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
-  // and each file named the version number 
-  if(sqlGet(db, name, extension)){
-    sqlInsert(db,name,extension);
-  }
+  // and each file named the version number
+  sqlInsert(db,name,extension);
 }
-var sqlGet = function (db, name, extension){
-  db.get(`select * from files where name = ? and extension = ?`,[name,extension],
+
+var sqlInsert = function(db,name,extension){
+  db.get(`select * from files where name = ? and extension = ? order by version desc`,[name,extension],
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
-     console.log("2");
-     console.log("old file",row.id);
-     return false;
-  });
-  return true;
-}
-var sqlInsert = function(db,name,extension){
-  console.log("3");
-    console.log("new file");
-    db.run(`INSERT INTO files(name,extension,version) VALUES(?,?,0)`, [name,extension], function(err) {
+     var version = 0;
+     if(row){
+        version = row.version + 1;
+     }
+    db.run(`INSERT INTO files(name,extension,version) VALUES(?,?,?)`, [name,extension,version], function(err) {
       if (err) {
         return console.log(err.message);
       }
-      // get the last insert id
-      console.log("4");
-      console.log(`A row has been inserted with rowid ${this.lastID}`);
     });
+  });
 }
 
 var fileReader = function(filename,req,res){
