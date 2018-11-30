@@ -7,6 +7,7 @@ var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 
+
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -30,7 +31,27 @@ app.post('/fileupload', (req, res) => {
 
 app.use(express.static('public'));
 
-
+app.get('/sqlaccess',(req, res)=>{
+  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+  var data = []
+  db.serialize(() => {
+    db.each(`select * from files`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     var rowData = {"id":row.id,"name": row.name,"type": row.type,"version": row.version};
+     data.push(rowData);
+     console.log(data);
+  });
+});
+console.log(data);
+});
 
 app.get('/getfiles', (req, res) => {
   fs.readdir("./public/files/", (err, files) => {
