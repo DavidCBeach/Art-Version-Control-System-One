@@ -11,47 +11,47 @@ const sqlite3 = require("sqlite3").verbose();
 const hostname = '127.0.0.1';
 const port = 3000;
 
+let global_req;
+let global_res;
+
 //TODO: for file compare read in all pixel info and compare between versions
 //if there is difference color with highlight effect
 //then show modified image to show changes in files
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm();
+  global_req = req;
+  global_res = res;
   form.parse(req, function (err, fields, files) {
-    var oldpath = files.filetoupload.path;
-    var newpath = './public/files/' + files.filetoupload.name;
-    sqlAdd(files.filetoupload.name);
-    fs.rename(oldpath, newpath, function (err) {
-      if (err) throw err;
-      fileReader("/home.html",req,res);
-    });
+
+    fileAdd(files);
 
 });
 });
 
 app.use(express.static('public'));
 
-app.get('/sqlaccess',(req, res)=>{
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
-    if (err) {
-      return console.error(err.message);
-    }
-    console.log('Connected to the in-memory SQlite database.');
-  });
-  var data = []
-  db.serialize(() => {
-    db.each(`select * from files`,
-     (err, row) => {
-     if (err) {
-       console.error(err.message);
-     }
-     var rowData = {"id":row.id,"name": row.name,"type": row.type,"version": row.version};
-     data.push(rowData);
-     console.log(data);
-  });
-});
-console.log(data);
-});
+// app.get('/sqlaccess',(req, res)=>{
+//   let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+//     if (err) {
+//       return console.error(err.message);
+//     }
+//     console.log('Connected to the in-memory SQlite database.');
+//   });
+//   var data = []
+//   db.serialize(() => {
+//     db.each(`select * from files`,
+//      (err, row) => {
+//      if (err) {
+//        console.error(err.message);
+//      }
+//      var rowData = {"id":row.id,"name": row.name,"type": row.type,"version": row.version};
+//      data.push(rowData);
+//      console.log(data);
+//   });
+// });
+// console.log(data);
+// });
 
 app.get('/getfiles', (req, res) => {
   fs.readdir("./public/files/", (err, files) => {
@@ -87,8 +87,9 @@ app.get('/*', (req, res) => {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
-var sqlAdd = function(filename){
-
+var fileAdd = function(files){
+  var filename  = files.filetoupload.name;
+  var filepath = files.filetoupload.path;
   let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
     if (err) {
       return console.error(err.message);
@@ -104,10 +105,23 @@ var sqlAdd = function(filename){
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
   // and each file named the version number
-  sqlInsert(db,name,extension);
+  fileInsert(db,name,extension,filepath,extension);
 }
 
-var sqlInsert = function(db,name,extension){
+var filePather = function(version,name,oldpath,extension){
+  var newpath = './public/files/' + name + '/'+version +'.'+extension;
+  var dir = './public/files/' + name;
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+  fs.rename(oldpath, newpath, function (err) {
+    if (err) throw err;
+    fileReader("/home.html",global_req,global_res);
+  });
+}
+
+
+var fileInsert = function(db,name,extension,filepath,extension){
   db.get(`select * from files where name = ? and extension = ? order by version desc`,[name,extension],
      (err, row) => {
      if (err) {
@@ -121,7 +135,9 @@ var sqlInsert = function(db,name,extension){
       if (err) {
         return console.log(err.message);
       }
+      filePather(version,name,filepath,extension);
     });
+    return version;
   });
 }
 
