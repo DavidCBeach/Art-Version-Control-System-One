@@ -53,9 +53,25 @@ app.use(express.static('public'));
 // console.log(data);
 // });
 
+app.get('/test', (req, res) => {
+  console.log(req.query.snake);
+});
+
 app.get('/getfiles', (req, res) => {
-  fs.readdir("./public/files/", (err, files) => {
+  fs.readdir("./public/files/"+req.query.file, (err, files) => {
    res.json({ files: files });
+  });
+
+});
+app.get('/getfolders', (req, res) => {
+  fs.readdir("./public/files/", (err, files) => {
+    var folders = [];
+    for(i = 0; i < files.length;i++){
+      if(!(files[i].includes(".png") || files[i].includes(".jpg") || files[i].includes(".JPG")|| files[i].includes(".gif"))){
+        folders.push(files[i])
+      }
+    }
+   res.json({ folders: folders });
 
   });
 
