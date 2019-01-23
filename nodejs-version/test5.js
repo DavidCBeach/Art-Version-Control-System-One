@@ -14,6 +14,7 @@ const sqlite3 = require("sqlite3").verbose();
 //file preview in library
 //photoshop files
 //multiple account support
+//make there be projects 
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -90,7 +91,7 @@ app.get('/getinfo', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-    db.all(`select * from files where name = ?`,[req.query.file],
+    db.all(`select * from files where name = ? order by version desc`,[req.query.file],
      (err, row) => {
      if (err) {
        console.error(err.message);
