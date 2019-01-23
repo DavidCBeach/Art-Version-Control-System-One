@@ -4,7 +4,7 @@
 </head>
 
 <body>
-<a href = "home.html">HOME</a>
+<a href = "library.html">LIBRARY</a>
 <ul>
   </ul>
 </body>
@@ -12,15 +12,13 @@
 console.log("running");
 const urlParams = new URLSearchParams(window.location.search);
 const folder = urlParams.get('file');
-$.ajax({
-  url: '/getfiles?file='+folder,
-  complete: function(data) {
-    var filenames = data["responseJSON"]["files"];
-    for(i = 0; i < filenames.length;i++){
-      if(filenames[i].includes(".png") || filenames[i].includes(".jpg") || filenames[i].includes(".JPG")){
-        $("ul").append("<li><img src='/files/"+folder+"/"+filenames[i]+"' height='300' width='auto'></li>");
-      }
-    }
+$.get('/getinfo?file='+folder).done(function(data){
+  info = data["info"];
+  for(i = 0; i < info.length; i++){
+    $("ul").append("<li><img src='/files/"+folder+"/"+info[i]["version"]+"."+info[i]["extension"]+"' height='300' width='auto'>");
+    var date= new Date(parseInt(data["info"][(i).toString()]["date"]));
+    $("ul").append("<p>"+date+"</p></li>");
   }
 });
+
 </script>

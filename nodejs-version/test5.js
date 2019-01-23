@@ -8,6 +8,14 @@ var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 
 
+//TODO:
+//drag and drop
+//difference showwer
+//file preview in library
+//date of upload for file in db
+//photoshop files
+//multiple account support
+
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -59,10 +67,30 @@ app.get('/test', (req, res) => {
 
 app.get('/getfiles', (req, res) => {
   fs.readdir("./public/files/"+req.query.file, (err, files) => {
-   res.json({ files: files });
+   res.json({ files: files});
+  });
+});
+
+app.get('/getinfo', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3', (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from files where name = ?`,[req.query.file],
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({info:row});
   });
 
+
 });
+
+
 app.get('/getfolders', (req, res) => {
   fs.readdir("./public/files/", (err, files) => {
     var folders = [];
@@ -78,7 +106,7 @@ app.get('/getfolders', (req, res) => {
 });
 
 app.get('/sqltest', (req, res) => {
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3', (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -106,7 +134,7 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 var fileAdd = function(files){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3', (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -147,10 +175,12 @@ var fileInsert = function(db,name,extension,filepath,extension){
      if(row){
         version = row.version + 1;
      }
-    db.run(`INSERT INTO files(name,extension,version) VALUES(?,?,?)`, [name,extension,version], function(err) {
+    var date =  new Date();
+    db.run(`INSERT INTO files(name,extension,version,date) VALUES(?,?,?,?)`, [name,extension,version,date], function(err) {
       if (err) {
         return console.log(err.message);
       }
+      date = null;
       filePather(version,name,filepath,extension);
     });
     return version;
