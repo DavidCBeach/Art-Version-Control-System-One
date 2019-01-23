@@ -12,7 +12,6 @@ const sqlite3 = require("sqlite3").verbose();
 //drag and drop
 //difference showwer
 //file preview in library
-//date of upload for file in db
 //photoshop files
 //multiple account support
 
@@ -66,13 +65,26 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/getfiles', (req, res) => {
-  fs.readdir("./public/files/"+req.query.file, (err, files) => {
-   res.json({ files: files});
+  console.log("something");
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
   });
+    db.all(`select distinct name from files`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files:row});
+  });
+
 });
 
 app.get('/getinfo', (req, res) => {
-  let db = new sqlite3.Database('./db/filedb2.sl3', (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -106,7 +118,7 @@ app.get('/getfolders', (req, res) => {
 });
 
 app.get('/sqltest', (req, res) => {
-  let db = new sqlite3.Database('./db/filedb2.sl3', (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -134,7 +146,7 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 var fileAdd = function(files){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
-  let db = new sqlite3.Database('./db/filedb2.sl3', (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
