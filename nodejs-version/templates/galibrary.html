@@ -1,0 +1,24 @@
+<head>
+   <meta charset="UTF-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+<a href = "library.html">LIBRARY</a>
+<ul>
+  </ul>
+</body>
+<script>
+console.log("running");
+const urlParams = new URLSearchParams(window.location.search);
+const folder = urlParams.get('file');
+$.get('/getinfo?file='+folder).done(function(data){
+  info = data["info"];
+  for(i = 0; i < info.length; i++){
+    $("ul").append("<li><img src='/files/"+folder+"/"+info[i]["version"]+"."+info[i]["extension"]+"' height='300' width='auto'>");
+    var date= new Date(parseInt(data["info"][(i).toString()]["date"]));
+    $("ul").append("<p>"+date+"</p></li>");
+  }
+});
+
+</script>

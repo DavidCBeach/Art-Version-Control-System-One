@@ -5,5 +5,15 @@
 <body>
   hey I am library
   <a href = "home.html">HOME</a>
-  
+  <ul>
+    </ul>
+  <script>
+  $.get('/getfiles').done(function(data){
+      console.log(data);
+      var foldernames = data["files"];
+      for(i = 0; i < foldernames.length;i++){
+        $("ul").append("<li><a href = 'galibrary.html?file="+foldernames[i]["name"]+"'>"+foldernames[i]["name"]+"</a></li>");
+      }
+  });
+</script>
 </body>

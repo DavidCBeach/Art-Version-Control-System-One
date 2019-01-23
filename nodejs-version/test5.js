@@ -8,6 +8,14 @@ var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 
 
+//TODO:
+//drag and drop
+//difference showwer
+//file preview in library
+//photoshop files
+//multiple account support
+//make there be projects 
+
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -53,16 +61,65 @@ app.use(express.static('public'));
 // console.log(data);
 // });
 
+app.get('/test', (req, res) => {
+  console.log(req.query.snake);
+});
+
 app.get('/getfiles', (req, res) => {
+  console.log("something");
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select distinct name from files`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files:row});
+  });
+
+});
+
+app.get('/getinfo', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from files where name = ? order by version desc`,[req.query.file],
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({info:row});
+  });
+
+
+});
+
+
+app.get('/getfolders', (req, res) => {
   fs.readdir("./public/files/", (err, files) => {
-   res.json({ files: files });
+    var folders = [];
+    for(i = 0; i < files.length;i++){
+      if(!(files[i].includes(".png") || files[i].includes(".jpg") || files[i].includes(".JPG")|| files[i].includes(".gif"))){
+        folders.push(files[i])
+      }
+    }
+   res.json({ folders: folders });
 
   });
 
 });
 
 app.get('/sqltest', (req, res) => {
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -90,7 +147,7 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 var fileAdd = function(files){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -131,10 +188,12 @@ var fileInsert = function(db,name,extension,filepath,extension){
      if(row){
         version = row.version + 1;
      }
-    db.run(`INSERT INTO files(name,extension,version) VALUES(?,?,?)`, [name,extension,version], function(err) {
+    var date =  new Date();
+    db.run(`INSERT INTO files(name,extension,version,date) VALUES(?,?,?,?)`, [name,extension,version,date], function(err) {
       if (err) {
         return console.log(err.message);
       }
+      date = null;
       filePather(version,name,filepath,extension);
     });
     return version;
