@@ -9,12 +9,11 @@ const sqlite3 = require("sqlite3").verbose();
 
 
 //TODO:
-//drag and drop
 //difference showwer
 //file preview in library
 //photoshop files
 //multiple account support
-//make there be projects 
+//make there be projects
 
 const hostname = '127.0.0.1';
 const port = 3000;
