@@ -6,6 +6,7 @@ var fs = require('fs');
 var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
+var PSD = require('psd');
 
 
 //TODO:
@@ -137,6 +138,10 @@ app.get('/sqltest', (req, res) => {
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
+    if(filename == "/"){
+      filename = "/home.html";
+    }
+    console.log(filename);
     fileReader(filename,req,res);
 });
 
@@ -161,7 +166,7 @@ var fileAdd = function(files){
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
   // and each file named the version number
-  fileInsert(db,name,extension,filepath,extension);
+  fileInsert(db,name,extension,filepath);
 }
 
 var filePather = function(version,name,oldpath,extension){
@@ -172,12 +177,15 @@ var filePather = function(version,name,oldpath,extension){
   }
   fs.rename(oldpath, newpath, function (err) {
     if (err) throw err;
+    if(extension == "psd"){
+      fileConverter('./public/files/' + name + '/'+version);
+    }
     fileReader("/home.html",global_req,global_res);
   });
 }
 
 
-var fileInsert = function(db,name,extension,filepath,extension){
+var fileInsert = function(db,name,extension,filepath){
   db.get(`select * from files where name = ? and extension = ? order by version desc`,[name,extension],
      (err, row) => {
      if (err) {
@@ -217,3 +225,11 @@ var fileReader = function(filename,req,res){
     });
 
   }
+
+var fileConverter = function(filename) {
+PSD.open(filename+".psd").then(function (psd) {
+  return psd.image.saveAsPng(filename+".png");
+}).then(function () {
+  console.log('Finished!');
+});
+}
