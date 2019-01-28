@@ -72,7 +72,6 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/getfiles', (req, res) => {
-  console.log("something");
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
@@ -88,6 +87,23 @@ app.get('/getfiles', (req, res) => {
      res.json({files:row});
   });
 
+});
+
+app.get('/getlatest', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from files order by version desc`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files:row});
+  });
 });
 
 app.get('/getinfo', (req, res) => {
