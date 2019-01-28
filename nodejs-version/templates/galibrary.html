@@ -19,11 +19,17 @@ $.get('/getinfo?file='+folder).done(function(data){
     if(extension == "psd"){
       extension = "png";
     }
-
-    $("ul").append("<li><img src='/files/"+folder+"/"+info[i]["version"]+"."+extension+"' height='300' width='auto'>");
+    path = folder+"/"+info[i]["version"]+".";
+    $("ul").append("<li><img src='/files/"+path+extension+"' height='300' width='auto'>");
     var date= new Date(parseInt(data["info"][(i).toString()]["date"]));
-    $("ul").append("<p>"+date+"</p></li>");
+    $("ul").append("<p>"+date+"</p>");
+    $("ul").append("<button onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"."+info[i]["extension"]+"')>Download</button></li>");
   }
 });
+function downloadFile (path,name){
+  console.log("download intiated",info[0]["extension"]);
+  //download(folder, "./public/files/"+path, "image/"+info[i]["extension"]);
+  window.open('/download?file='+path+'&name='+name);
 
+}
 </script>

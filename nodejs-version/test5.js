@@ -61,6 +61,12 @@ app.use(express.static('public'));
 // console.log(data);
 // });
 
+app.get('/download', function(req, res){
+  var file = "./public/files/"+ req.query.file;
+  res.download(file,req.query.name); // Set disposition and send it.
+});
+
+
 app.get('/test', (req, res) => {
   console.log(req.query.snake);
 });
