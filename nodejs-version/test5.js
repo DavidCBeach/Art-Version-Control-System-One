@@ -11,7 +11,6 @@ var PSD = require('psd');
 
 //TODO:
 //difference showwer
-//file preview in library
 //multiple account support
 //make there be projects
 
