@@ -223,36 +223,54 @@ var filePather = function(version,name,oldpath,extension){
   });
 }
 
+var filesInsert = function(db,name,extension,version,id ){
+  var date =  new Date();
+  db.run(`INSERT INTO files(name,extension,version,date, project_id) VALUES(?,?,?,?,?)`, [name,extension,version,date,id], function(err) {
+    if (err) {
+      return console.log(err.message);
+    }
+    console.log(version, id);
+    db.run(`update projects set version = ? where id = ?`, [version,id], function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
+      console.log("updated");
+    });
+    date = null;
+
+  });
+}
 
 var fileInsert = function(db,name,extension,filepath){
   db.get(`select id,version from projects where name = ? `,[name],
      (err, row) => {
      if (err) {
-       console.error(err.message);
+       console.error("vsause error here",err.message);
      }
-      version = 0;
-     if(row){
-        version = row.version + 1;
-     }
-      id = row.id;
-    var date =  new Date();
+     if (row) {
+       version = row.version + 1;
+       id = row.id;
     console.log(version, id);
-    db.run(`INSERT INTO files(name,extension,version,date, project_id) VALUES(?,?,?,?,?)`, [name,extension,version,date,id], function(err) {
-      if (err) {
-        return console.log(err.message);
-      }
-      console.log(version, id);
-      db.run(`update projects set version = ? where id = ?`, [version,id], function(err) {
-        if (err) {
-          return console.log(err.message);
-        }
-        console.log("updated");
-      });
-      date = null;
-      filePather(version,name,filepath,extension);
-    });
+    filesInsert(db, name,extension,version,id);
+    filePather(version,name,filepath,extension);
+  } else {
+    db.run('insert into projects(name,version) values(?,?)',[name,0], function(err) {
+      if (err) {console.error("vsause error here",err.message);}
+      version = 0;
+      db.get(`select id from projects where name = ? `,[name],
+         (err, row) => {
+         if (err) {
+           console.error("vsause error here",err.message);
+         }
+         id = row.id;
+         filesInsert(db,name,extension,version,id);
+         filePather(version,name,filepath,extension);
+       });
+});
+}
 
   });
+
 }
 
 var fileReader = function(filename,req,res){
@@ -262,13 +280,14 @@ var fileReader = function(filename,req,res){
     if (err) {
       res.writeHead(404, {'Content-Type': 'text/html'});
       console.log("[404] "+ req.url);
-      fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+      //fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
       return res.end("404 Not Found");
     }
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(data);
     console.log("[200] "+req.url);
-    fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+    //disabling log
+    //fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
     return res.end();
     });
 
