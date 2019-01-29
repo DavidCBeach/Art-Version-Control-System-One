@@ -1,6 +1,7 @@
 <head>
    <meta charset="UTF-8">
      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="styles/style.css">
 </head>
 <body>
   hey I am library
@@ -8,11 +9,16 @@
   <ul>
     </ul>
   <script>
-  $.get('/getfiles').done(function(data){
+  $.get('/getlatest').done(function(data){
       console.log(data);
-      var foldernames = data["files"];
-      for(i = 0; i < foldernames.length;i++){
-        $("ul").append("<li><a href = 'galibrary.html?file="+foldernames[i]["name"]+"'>"+foldernames[i]["name"]+"</a></li>");
+      var info = data["files"];
+      for(i = 0; i < info.length;i++){
+        var extension = info[i]["extension"];
+        if(extension == "psd"){
+          extension = "png";
+        }
+        path = info[i]["name"]+"/"+info[i]["version"]+".";
+        $("ul").append("<li><a href = 'galibrary.html?file="+info[i]["name"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'>"+info[i]["name"]+"</a></li>");
       }
   });
 </script>

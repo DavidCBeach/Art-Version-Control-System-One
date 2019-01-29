@@ -1,10 +1,18 @@
 <head>
    <meta charset="UTF-8">
+   <link rel="stylesheet" type="text/css" href="styles/style.css">
 </head>
 <body>
+
 	<a href = "home.html">HOME</a>
-	<form action="fileupload" method="post" enctype="multipart/form-data">
-		<input type="file" name="filetoupload"><br>
-		<input type="submit">
+  <h1>Click Anywhere  Below to Pick File</h1>
+	<form id ="myformone"  action="fileupload" method="post" enctype="multipart/form-data">
+		<input type="file" id = "fileholder"name="filetoupload" onchange="submit()"><br>
 	</form>
+<script>
+  function submit() {
+    console.log("submitting");
+   document.getElementById("myformone").submit();
+ }
+</script>
 </body>

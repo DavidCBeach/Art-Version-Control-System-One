@@ -6,15 +6,13 @@ var fs = require('fs');
 var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
+var PSD = require('psd');
 
 
 //TODO:
-//drag and drop
 //difference showwer
-//file preview in library
-//photoshop files
 //multiple account support
-//make there be projects 
+//make there be projects
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -61,12 +59,17 @@ app.use(express.static('public'));
 // console.log(data);
 // });
 
+app.get('/download', function(req, res){
+  var file = "./public/files/"+ req.query.file;
+  res.download(file,req.query.name); // Set disposition and send it.
+});
+
+
 app.get('/test', (req, res) => {
   console.log(req.query.snake);
 });
 
 app.get('/getfiles', (req, res) => {
-  console.log("something");
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
@@ -83,6 +86,25 @@ app.get('/getfiles', (req, res) => {
   });
 
 });
+app.get('/getlatest', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from projects, files where projects.id = files.project_id and projects.version = files.version`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files:row});
+  });
+
+
+});
+
 
 app.get('/getinfo', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -118,7 +140,7 @@ app.get('/getfolders', (req, res) => {
 
 });
 
-app.get('/sqltest', (req, res) => {
+app.get('/sqlfiles', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
@@ -134,10 +156,30 @@ app.get('/sqltest', (req, res) => {
      res.json({files: row})
   });
 });
+app.get('/sqlprojects', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from projects`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files: row})
+  });
+});
 
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
+    if(filename == "/"){
+      filename = "/home.html";
+    }
+    console.log(filename);
     fileReader(filename,req,res);
 });
 
@@ -162,7 +204,7 @@ var fileAdd = function(files){
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
   // and each file named the version number
-  fileInsert(db,name,extension,filepath,extension);
+  fileInsert(db,name,extension,filepath);
 }
 
 var filePather = function(version,name,oldpath,extension){
@@ -173,30 +215,42 @@ var filePather = function(version,name,oldpath,extension){
   }
   fs.rename(oldpath, newpath, function (err) {
     if (err) throw err;
+    if(extension == "psd"){
+      fileConverter('./public/files/' + name + '/'+version);
+    }
     fileReader("/home.html",global_req,global_res);
   });
 }
 
 
-var fileInsert = function(db,name,extension,filepath,extension){
-  db.get(`select * from files where name = ? and extension = ? order by version desc`,[name,extension],
+var fileInsert = function(db,name,extension,filepath){
+  db.get(`select id,version from projects where name = ? `,[name],
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
-     var version = 0;
+      version = 0;
      if(row){
         version = row.version + 1;
      }
+      id = row.id;
     var date =  new Date();
-    db.run(`INSERT INTO files(name,extension,version,date) VALUES(?,?,?,?)`, [name,extension,version,date], function(err) {
+    console.log(version, id);
+    db.run(`INSERT INTO files(name,extension,version,date, project_id) VALUES(?,?,?,?,?)`, [name,extension,version,date,id], function(err) {
       if (err) {
         return console.log(err.message);
       }
+      console.log(version, id);
+      db.run(`update projects set version = ? where id = ?`, [version,id], function(err) {
+        if (err) {
+          return console.log(err.message);
+        }
+        console.log("updated");
+      });
       date = null;
       filePather(version,name,filepath,extension);
     });
-    return version;
+
   });
 }
 
@@ -218,3 +272,11 @@ var fileReader = function(filename,req,res){
     });
 
   }
+
+var fileConverter = function(filename) {
+PSD.open(filename+".psd").then(function (psd) {
+  return psd.image.saveAsPng(filename+".png");
+}).then(function () {
+  console.log('Finished!');
+});
+}
