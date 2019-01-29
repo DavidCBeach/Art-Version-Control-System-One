@@ -12,7 +12,6 @@ var PSD = require('psd');
 //TODO:
 //difference showwer
 //file preview in library
-//photoshop files
 //multiple account support
 //make there be projects
 
@@ -88,7 +87,6 @@ app.get('/getfiles', (req, res) => {
   });
 
 });
-
 app.get('/getlatest', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -96,7 +94,7 @@ app.get('/getlatest', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-    db.all(`select * from files order by version desc`,
+    db.all(`select * from projects, files where projects.id = files.project_id and projects.version = files.version`,
      (err, row) => {
      if (err) {
        console.error(err.message);
@@ -104,7 +102,10 @@ app.get('/getlatest', (req, res) => {
      console.log(row);
      res.json({files:row});
   });
+
+
 });
+
 
 app.get('/getinfo', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -140,7 +141,7 @@ app.get('/getfolders', (req, res) => {
 
 });
 
-app.get('/sqltest', (req, res) => {
+app.get('/sqlfiles', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
@@ -148,6 +149,22 @@ app.get('/sqltest', (req, res) => {
     console.log('Connected to the in-memory SQlite database.');
   });
     db.all(`select * from files`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files: row})
+  });
+});
+app.get('/sqlprojects', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from projects`,
      (err, row) => {
      if (err) {
        console.error(err.message);
@@ -208,24 +225,33 @@ var filePather = function(version,name,oldpath,extension){
 
 
 var fileInsert = function(db,name,extension,filepath){
-  db.get(`select * from files where name = ? and extension = ? order by version desc`,[name,extension],
+  db.get(`select id,version from projects where name = ? `,[name],
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
-     var version = 0;
+      version = 0;
      if(row){
         version = row.version + 1;
      }
+      id = row.id;
     var date =  new Date();
-    db.run(`INSERT INTO files(name,extension,version,date) VALUES(?,?,?,?)`, [name,extension,version,date], function(err) {
+    console.log(version, id);
+    db.run(`INSERT INTO files(name,extension,version,date, project_id) VALUES(?,?,?,?,?)`, [name,extension,version,date,id], function(err) {
       if (err) {
         return console.log(err.message);
       }
+      console.log(version, id);
+      db.run(`update projects set version = ? where id = ?`, [version,id], function(err) {
+        if (err) {
+          return console.log(err.message);
+        }
+        console.log("updated");
+      });
       date = null;
       filePather(version,name,filepath,extension);
     });
-    return version;
+
   });
 }
 
