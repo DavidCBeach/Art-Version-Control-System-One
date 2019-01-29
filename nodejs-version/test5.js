@@ -6,10 +6,19 @@ var fs = require('fs');
 var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
+var PSD = require('psd');
 
+
+//TODO:
+//difference showwer
+//multiple account support
+//make there be projects
 
 const hostname = '127.0.0.1';
 const port = 3000;
+
+let global_req;
+let global_res;
 
 //TODO: for file compare read in all pixel info and compare between versions
 //if there is difference color with highlight effect
@@ -17,52 +26,122 @@ const port = 3000;
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm();
+  global_req = req;
+  global_res = res;
   form.parse(req, function (err, fields, files) {
-    var oldpath = files.filetoupload.path;
-    var newpath = './public/files/' + files.filetoupload.name;
-    sqlAdd(files.filetoupload.name);
-    fs.rename(oldpath, newpath, function (err) {
-      if (err) throw err;
-      fileReader("/home.html",req,res);
-    });
+
+    fileAdd(files);
 
 });
 });
 
 app.use(express.static('public'));
 
-app.get('/sqlaccess',(req, res)=>{
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+// app.get('/sqlaccess',(req, res)=>{
+//   let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+//     if (err) {
+//       return console.error(err.message);
+//     }
+//     console.log('Connected to the in-memory SQlite database.');
+//   });
+//   var data = []
+//   db.serialize(() => {
+//     db.each(`select * from files`,
+//      (err, row) => {
+//      if (err) {
+//        console.error(err.message);
+//      }
+//      var rowData = {"id":row.id,"name": row.name,"type": row.type,"version": row.version};
+//      data.push(rowData);
+//      console.log(data);
+//   });
+// });
+// console.log(data);
+// });
+
+app.get('/download', function(req, res){
+  var file = "./public/files/"+ req.query.file;
+  res.download(file,req.query.name); // Set disposition and send it.
+});
+
+
+app.get('/test', (req, res) => {
+  console.log(req.query.snake);
+});
+
+app.get('/getfiles', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-  var data = []
-  db.serialize(() => {
-    db.each(`select * from files`,
+    db.all(`select distinct name from files`,
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
-     var rowData = {"id":row.id,"name": row.name,"type": row.type,"version": row.version};
-     data.push(rowData);
-     console.log(data);
+     console.log(row);
+     res.json({files:row});
   });
+
 });
-console.log(data);
+app.get('/getlatest', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from projects, files where projects.id = files.project_id and projects.version = files.version`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files:row});
+  });
+
+
 });
 
-app.get('/getfiles', (req, res) => {
+
+app.get('/getinfo', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from files where name = ? order by version desc`,[req.query.file],
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({info:row});
+  });
+
+
+});
+
+
+app.get('/getfolders', (req, res) => {
   fs.readdir("./public/files/", (err, files) => {
-   res.json({ files: files });
+    var folders = [];
+    for(i = 0; i < files.length;i++){
+      if(!(files[i].includes(".png") || files[i].includes(".jpg") || files[i].includes(".JPG")|| files[i].includes(".gif"))){
+        folders.push(files[i])
+      }
+    }
+   res.json({ folders: folders });
 
   });
 
 });
 
-app.get('/sqltest', (req, res) => {
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+app.get('/sqlfiles', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -77,19 +156,40 @@ app.get('/sqltest', (req, res) => {
      res.json({files: row})
   });
 });
+app.get('/sqlprojects', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from projects`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     console.log(row);
+     res.json({files: row})
+  });
+});
 
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
+    if(filename == "/"){
+      filename = "/home.html";
+    }
+    console.log(filename);
     fileReader(filename,req,res);
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
-var sqlAdd = function(filename){
-
-  let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
+var fileAdd = function(files){
+  var filename  = files.filetoupload.name;
+  var filepath = files.filetoupload.path;
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -104,24 +204,53 @@ var sqlAdd = function(filename){
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
   // and each file named the version number
-  sqlInsert(db,name,extension);
+  fileInsert(db,name,extension,filepath);
 }
 
-var sqlInsert = function(db,name,extension){
-  db.get(`select * from files where name = ? and extension = ? order by version desc`,[name,extension],
+var filePather = function(version,name,oldpath,extension){
+  var newpath = './public/files/' + name + '/'+version +'.'+extension;
+  var dir = './public/files/' + name;
+  if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+  }
+  fs.rename(oldpath, newpath, function (err) {
+    if (err) throw err;
+    if(extension == "psd"){
+      fileConverter('./public/files/' + name + '/'+version);
+    }
+    fileReader("/home.html",global_req,global_res);
+  });
+}
+
+
+var fileInsert = function(db,name,extension,filepath){
+  db.get(`select id,version from projects where name = ? `,[name],
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
-     var version = 0;
+      version = 0;
      if(row){
         version = row.version + 1;
      }
-    db.run(`INSERT INTO files(name,extension,version) VALUES(?,?,?)`, [name,extension,version], function(err) {
+      id = row.id;
+    var date =  new Date();
+    console.log(version, id);
+    db.run(`INSERT INTO files(name,extension,version,date, project_id) VALUES(?,?,?,?,?)`, [name,extension,version,date,id], function(err) {
       if (err) {
         return console.log(err.message);
       }
+      console.log(version, id);
+      db.run(`update projects set version = ? where id = ?`, [version,id], function(err) {
+        if (err) {
+          return console.log(err.message);
+        }
+        console.log("updated");
+      });
+      date = null;
+      filePather(version,name,filepath,extension);
     });
+
   });
 }
 
@@ -143,3 +272,11 @@ var fileReader = function(filename,req,res){
     });
 
   }
+
+var fileConverter = function(filename) {
+PSD.open(filename+".psd").then(function (psd) {
+  return psd.image.saveAsPng(filename+".png");
+}).then(function () {
+  console.log('Finished!');
+});
+}
