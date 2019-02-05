@@ -18,7 +18,12 @@
           extension = "png";
         }
         path = info[i]["name"]+"/"+info[i]["version"]+".";
-        $("ul").append("<li><a href = 'galibrary.html?file="+info[i]["name"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'>"+info[i]["name"]+"</a></li>");
+        var appendic = "<li><a href = 'galibrary.html?file="+info[i]["name"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'>"+info[i]["name"]+"</a>";
+        var  appendic2 = "</li>";
+        var progname = info[i]["name"];
+        var form = "<form action='fileupload/progname="+progname+"' method='post' enctype='multipart/form-data'><input type='file' name='filetoupload'><br><input type='submit'></form>";
+        $("ul").append(appendic +form +  appendic2);
+
       }
   });
 </script>
