@@ -22,9 +22,14 @@
         var  appendic2 = "</li>";
         var progname = info[i]["name"];
         var form = "<form action='fileupload/progname="+progname+"' method='post' enctype='multipart/form-data'><input type='file' name='filetoupload'><br><input type='submit'></form>";
-        $("ul").append(appendic +form +  appendic2);
+        var form2 = "<form id ='"+progname+"'  action='fileupload?name="+progname+"' method='post' enctype='multipart/form-data'>	<input type='file' class = 'fileup'name='filetoupload' onchange='submit("+progname+")'><br></form>";
+        $("ul").append(appendic +form2 +  appendic2);
 
       }
   });
+  function submit(id) {
+    console.log("submitting");
+   document.getElementById(id).submit();
+ }
 </script>
 </body>

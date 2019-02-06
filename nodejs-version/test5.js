@@ -201,7 +201,7 @@ var fileAdd = function(files){
   var length = filenameParts.length;
   var extension = filenameParts[length-1];
   filenameParts.length = length - 1;
-  var name = filenameParts.join('.');
+  var name = global_req.query.name;
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
   // and each file named the version number
