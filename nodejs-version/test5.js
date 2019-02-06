@@ -7,6 +7,9 @@ var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 var PSD = require('psd');
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 //TODO:
@@ -35,6 +38,17 @@ app.post('/fileupload', (req, res) => {
 
 });
 });
+app.post('/progupload', (req, res) => {
+  var form = new formidable.IncomingForm();
+  global_req = req;
+  global_res = res;
+  form.parse(req, function (err, fields, files) {
+
+    fileAdd(files,true);
+
+});
+});
+
 
 app.use(express.static('public'));
 
@@ -187,7 +201,7 @@ app.get('/*', (req, res) => {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
-var fileAdd = function(files){
+var fileAdd = function(files,prog = false){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -201,7 +215,13 @@ var fileAdd = function(files){
   var length = filenameParts.length;
   var extension = filenameParts[length-1];
   filenameParts.length = length - 1;
-  var name = global_req.query.name;
+  if(!prog){
+    name = global_req.query.name;
+  } else {
+    name = global_req.body;
+  }
+  console.log(global_req.query.name);
+
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
   // and each file named the version number

@@ -6,12 +6,13 @@
 <body>
   hey I am library
   <a href = "home.html">HOME</a>
+  <a href = "newProject.html">ADD PROJECT</a>
   <ul>
     </ul>
   <script>
   $.get('/getlatest').done(function(data){
       console.log(data);
-      var info = data["files"];
+      var info = data["files"].reverse();
       for(i = 0; i < info.length;i++){
         var extension = info[i]["extension"];
         if(extension == "psd"){
