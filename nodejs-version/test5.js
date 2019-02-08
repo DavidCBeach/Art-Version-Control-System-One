@@ -7,13 +7,14 @@ var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 var PSD = require('psd');
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
 
 
 //TODO:
 //difference showwer
-//upload file to project by "drag drop on project" on file in library
 //multiple account support
-//make there be projects
+//Multiple files with same version number for project with multiple files
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -35,6 +36,16 @@ app.post('/fileupload', (req, res) => {
 
 });
 });
+app.post('/progupload', (req, res) => {
+  //console.log(req.body);
+  var form = new formidable.IncomingForm();
+  global_req = req;
+  global_res = res;
+  form.parse(req, function (err, fields, files) {
+    fileAdd(files,true,fields.progname);
+});
+});
+
 
 app.use(express.static('public'));
 
@@ -62,7 +73,7 @@ app.use(express.static('public'));
 
 app.get('/download', function(req, res){
   var file = "./public/files/"+ req.query.file;
-  res.download(file,req.query.name); // Set disposition and send it.
+  res.download(file,req.query.name+req.query.dateversion); // Set disposition and send it.
 });
 
 
@@ -187,7 +198,7 @@ app.get('/*', (req, res) => {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
-var fileAdd = function(files){
+var fileAdd = function(files,prog = false,progname = ""){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -201,7 +212,13 @@ var fileAdd = function(files){
   var length = filenameParts.length;
   var extension = filenameParts[length-1];
   filenameParts.length = length - 1;
-  var name = filenameParts.join('.');
+  if(!prog){
+    name = global_req.query.name;
+  } else {
+    name = progname;
+  }
+  console.log(global_req.query.name);
+
   //TODO: input each file upload as new row and make get get the largest version of file to make the
   // new row the next version. also file might be put into a folder with file name as folder name
   // and each file named the version number
@@ -219,7 +236,7 @@ var filePather = function(version,name,oldpath,extension){
     if(extension == "psd"){
       fileConverter('./public/files/' + name + '/'+version);
     }
-    fileReader("/home.html",global_req,global_res);
+    fileReader("/library.html",global_req,global_res);
   });
 }
 

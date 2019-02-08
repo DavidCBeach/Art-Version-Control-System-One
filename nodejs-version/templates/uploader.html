@@ -7,12 +7,12 @@
 	<a href = "home.html">HOME</a>
   <h1>Click Anywhere  Below to Pick File</h1>
 	<form id ="myformone"  action="fileupload" method="post" enctype="multipart/form-data">
-		<input type="file" id = "fileholder"name="filetoupload" onchange="submit()"><br>
+		<input type="file" id = "fileholder"name="filetoupload" onchange="submit("+id+")"><br>
 	</form>
 <script>
-  function submit() {
+  function submit(id) {
     console.log("submitting");
-   document.getElementById("myformone").submit();
+   document.getElementById(id).submit();
  }
 </script>
 </body>
