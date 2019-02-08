@@ -13,9 +13,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //TODO:
 //difference showwer
-//upload file to project by "drag drop on project" on file in library
 //multiple account support
-//make there be projects
+//Multiple files with same version number for project with multiple files
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -74,7 +73,7 @@ app.use(express.static('public'));
 
 app.get('/download', function(req, res){
   var file = "./public/files/"+ req.query.file;
-  res.download(file,req.query.name); // Set disposition and send it.
+  res.download(file,req.query.name+req.query.dateversion); // Set disposition and send it.
 });
 
 
@@ -237,7 +236,7 @@ var filePather = function(version,name,oldpath,extension){
     if(extension == "psd"){
       fileConverter('./public/files/' + name + '/'+version);
     }
-    fileReader("/home.html",global_req,global_res);
+    fileReader("/library.html",global_req,global_res);
   });
 }
 
