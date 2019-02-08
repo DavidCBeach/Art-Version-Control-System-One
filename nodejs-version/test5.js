@@ -8,7 +8,6 @@ var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 var PSD = require('psd');
 const bodyParser = require('body-parser');
-
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
@@ -39,13 +38,12 @@ app.post('/fileupload', (req, res) => {
 });
 });
 app.post('/progupload', (req, res) => {
+  //console.log(req.body);
   var form = new formidable.IncomingForm();
   global_req = req;
   global_res = res;
   form.parse(req, function (err, fields, files) {
-
-    fileAdd(files,true);
-
+    fileAdd(files,true,fields.progname);
 });
 });
 
@@ -201,7 +199,7 @@ app.get('/*', (req, res) => {
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
-var fileAdd = function(files,prog = false){
+var fileAdd = function(files,prog = false,progname = ""){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -218,7 +216,7 @@ var fileAdd = function(files,prog = false){
   if(!prog){
     name = global_req.query.name;
   } else {
-    name = global_req.body;
+    name = progname;
   }
   console.log(global_req.query.name);
 
