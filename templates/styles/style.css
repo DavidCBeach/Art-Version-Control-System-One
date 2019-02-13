@@ -45,6 +45,9 @@ ul{
 .fileup{
 
 }
+li{
+  margin-bottom: 50px;
+}
 #whitespace{
   position: fixed;
   top: 0;
@@ -64,5 +67,35 @@ a{
   color:#2b2b2b;
 }
 form{
-  
+  opacity: 0;
+}
+.uploadSpace{
+  width: 58px;
+  height:15px;
+  position: relative;
+  color:red;
+
+}
+.fileUpload{
+  top: 0;
+    left: 0;
+    width: 58px;
+    height:15px;
+    position:absolute;
+    color:inherit;
+}
+.uploadSpace:hover{
+  color:#a80000;
+}
+
+.fileup{
+  top: 0;
+    left: 0;
+    width: 58px;
+    height:15px;
+    position: absolute;
+    z-index: -1;
+}
+#topspacer{
+  height: 140;
 }
