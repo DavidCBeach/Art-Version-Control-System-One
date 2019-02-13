@@ -1,1 +1,0 @@
-This is just a website/ VCS to practice web dev/ VC 

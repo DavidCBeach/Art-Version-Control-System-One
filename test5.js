@@ -189,7 +189,7 @@ app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
     if(filename == "/"){
-      filename = "/home.html";
+      filename = "/library.html";
     }
     console.log(filename);
     fileReader(filename,req,res);

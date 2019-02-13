@@ -2,13 +2,23 @@
    <meta charset="UTF-8">
      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
       <link rel="stylesheet" type="text/css" href="styles/style.css">
+      <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
 </head>
 <body>
-  hey I am library
-  <a href = "home.html">HOME</a>
-  <a href = "newProject.html">ADD PROJECT</a>
+  <div id = "whitespace"></div>
+  <div id = "shelf">
+
+  <div id = "titles">
+    <span class = "title"> A.V.C.S. </span>
+    <span class = "subtitle">Art Version Control System</span>
+
+
+  <br>
+  <a id= "newProject"href = "newProject.html">ADD PROJECT</a>
+  </div>
   <ul>
     </ul>
+      </div>
   <script>
   $.get('/getlatest').done(function(data){
       console.log(data);
@@ -22,7 +32,6 @@
         var appendic = "<li><a href = 'galibrary.html?file="+info[i]["name"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'>"+info[i]["name"]+"</a>";
         var  appendic2 = "</li>";
         var progname = info[i]["name"];
-        var form = "<form action='fileupload/progname="+progname+"' method='post' enctype='multipart/form-data'><input type='file' name='filetoupload'><br><input type='submit'></form>";
         var form2 = "<form id ='"+progname+"'  action='fileupload?name="+progname+"' method='post' enctype='multipart/form-data'>	<input type='file' class = 'fileup'name='filetoupload' onchange='submit("+progname+")'><br></form>";
         $("ul").append(appendic +form2 +  appendic2);
 
