@@ -18,9 +18,14 @@
   <div id= "topspacer">
   </div>
   <div id="progUploadCon">
-  <form action='progupload' id= "progUpload" method='post' enctype='multipart/form-data'>
+  <form name='progform' action='progupload' id= "progUpload" method='post' enctype='multipart/form-data'>
     <span>Project Name: </span><input type='text' name='progname'>  <br> <br>
-    <span>Project File: </span><input type='file' name='filetoupload'>
+    <span>Project File: </span>
+    <div class= 'uploadSpace2'>
+      <span class= 'fileUpload'>UPLOAD FILE</span>
+        <input id = 'uploader'class='uploadForm' type='file' name='filetoupload'>
+      </div>
+      <span id='checker'></span>
     <br> <br>
     <div id='submit'>
     <input  id="submitter"type='submit' value ='Submit'>
@@ -29,3 +34,12 @@
   </div>
 
 </body>
+<script>
+var up = document.getElementById('uploader');
+up.onchange = function(){
+  console.log(document.progform.filetoupload.value);
+  var filename = document.progform.filetoupload.value
+  document.getElementById('checker').innerHTML = filename.split("\\")[2];
+};
+
+</script>

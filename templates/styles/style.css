@@ -114,6 +114,8 @@ a{
 }
 .uploadForm{
   opacity: 0;
+  width: inherit;
+  height: inherit;
 }
 .uploadSpace{
   width: 58px;
@@ -121,6 +123,14 @@ a{
   position: relative;
   color:red;
   text-align: right;
+}
+.uploadSpace2{
+  width: 58px;
+  height:15px;
+  position: relative;
+  color:red;
+  text-align: right;
+  display: inline;
 }
 .fileUpload{
   top: 0;
@@ -131,6 +141,9 @@ a{
     color:inherit;
 }
 .uploadSpace:hover{
+  color:#a80000;
+}
+.uploadSpace2:hover{
   color:#a80000;
 }
 
@@ -159,8 +172,8 @@ a{
 input{
   border-style: hidden;
   font: inherit;
+
 }
 #progUploadCon{
   text-align: center;
-
 }
