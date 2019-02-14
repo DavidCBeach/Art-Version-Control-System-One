@@ -1,16 +1,31 @@
 <head>
    <meta charset="UTF-8">
-
-      <link rel="stylesheet" type="text/css" href="styles/style.css">
+   <link rel="stylesheet" type="text/css" href="styles/style.css">
+   <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
 </head>
 <body>
-  hey I am new project
-    <a href = "library.html">LIBRARY</a>
-  <form action='progupload' method='post' enctype='multipart/form-data'>
-    <input type='text' name='progname'>
-    <input type='file' name='filetoupload'>
-    <br>
-    <input type='submit'>
+  <div id = "whitespace"></div>
+  <div id = "shelf">
+
+  <div id = "titles">
+    <span class = "title"> A.V.C.S. </span>
+    <span class = "subtitle">Art Version Control System</span>
+
+
+  <br>
+<a id = "library" href = "library.html">LIBRARY</a>
+  </div>
+  <div id= "topspacer">
+  </div>
+  <div id="progUploadCon">
+  <form action='progupload' id= "progUpload" method='post' enctype='multipart/form-data'>
+    <span>Project Name: </span><input type='text' name='progname'>  <br> <br>
+    <span>Project File: </span><input type='file' name='filetoupload'>
+    <br> <br>
+    <div id='submit'>
+    <input  id="submitter"type='submit' value ='Submit'>
+    </div>
   </form>
+  </div>
 
 </body>

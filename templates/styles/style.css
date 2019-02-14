@@ -33,6 +33,9 @@ table{
   font-style: normal;
   border-collapse: collapse;
 }
+ul{
+  list-style: none;
+}
 th{
   width:400px;
   font-weight: normal;
@@ -98,14 +101,20 @@ tr{
 #newProject:hover{
   color:#a80000;
 }
+#library{
+  text-decoration: none;
+  color: red;
+}
+#library:hover{
+  color:#a80000;
+}
 a{
   text-decoration: none;
   color:#2b2b2b;
 }
-form{
+.uploadForm{
   opacity: 0;
 }
-
 .uploadSpace{
   width: 58px;
   height:15px;
@@ -134,4 +143,24 @@ form{
 }
 #topspacer{
   height: 140;
+}
+#progUpload{
+  text-align: left;
+  display: inline-block;
+  width: 300px;
+  margin-left: 50px;
+}
+#submit{
+  text-align: center;
+}
+#submitter{
+  margin-right: 50px;
+}
+input{
+  border-style: hidden;
+  font: inherit;
+}
+#progUploadCon{
+  text-align: center;
+
 }
