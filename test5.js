@@ -42,34 +42,17 @@ app.post('/progupload', (req, res) => {
   global_req = req;
   global_res = res;
   form.parse(req, function (err, fields, files) {
-    fileAdd(files,true,fields.progname);
+    if(files.filetoupload.name && fields.progname){
+      fileAdd(files,true,fields.progname);
+    } else {
+      fileReader("/newProject.html",req,res);
+    }
+
 });
 });
 
 
 app.use(express.static('public'));
-
-// app.get('/sqlaccess',(req, res)=>{
-//   let db = new sqlite3.Database('./db/filedb.sl3', (err) => {
-//     if (err) {
-//       return console.error(err.message);
-//     }
-//     console.log('Connected to the in-memory SQlite database.');
-//   });
-//   var data = []
-//   db.serialize(() => {
-//     db.each(`select * from files`,
-//      (err, row) => {
-//      if (err) {
-//        console.error(err.message);
-//      }
-//      var rowData = {"id":row.id,"name": row.name,"type": row.type,"version": row.version};
-//      data.push(rowData);
-//      console.log(data);
-//   });
-// });
-// console.log(data);
-// });
 
 app.get('/download', function(req, res){
   var file = "./public/files/"+ req.query.file;
@@ -189,7 +172,7 @@ app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
     if(filename == "/"){
-      filename = "/home.html";
+      filename = "/library.html";
     }
     console.log(filename);
     fileReader(filename,req,res);
@@ -236,6 +219,7 @@ var filePather = function(version,name,oldpath,extension){
     if(extension == "psd"){
       fileConverter('./public/files/' + name + '/'+version);
     }
+    //TODO: galibrary upload returns to galibrary
     fileReader("/library.html",global_req,global_res);
   });
 }

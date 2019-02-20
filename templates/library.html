@@ -1,0 +1,51 @@
+<head>
+   <meta charset="UTF-8">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="styles/style.css">
+      <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
+</head>
+<body>
+  <div id = "whitespace"></div>
+  <div id = "shelf">
+
+  <div id = "titles">
+    <span class = "title"> A.V.C.S. </span>
+    <span class = "subtitle">Art Version Control System</span>
+
+
+  <br>
+  <h2 class="pagename">Library</h2>
+  <a id= "newProject"href = "newProject.html">ADD PROJECT</a>
+  </div>
+  <div id= "topspacer">
+  </div>
+  <table>
+    </table>
+      </div>
+  <script>
+  $.get('/getlatest').done(function(data){
+      console.log(data);
+      var info = data["files"].reverse();
+      for(i = 0; i < info.length;i++){
+        var extension = info[i]["extension"];
+        if(extension == "psd"){
+          extension = "png";
+        }
+        path = info[i]["name"]+"/"+info[i]["version"]+".";
+          var appendic = "<tr><th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["name"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'></a></th>";
+        var  appendic2 = "</tr>";
+        var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["name"]+"'><span class= 'projectName'>"+info[i]["name"]+"</span></a></th>";
+        var progname = info[i]["name"];
+        var button = "<th class = 'uploadrow'><div class= 'uploadSpace'><span class= 'fileUpload'>UPLOAD FILE</span>";
+        var button2 = "</div></th>";
+        var form2 = "<form id ='"+progname+"' class='uploadForm'  action='fileupload?name="+progname+"' method='post' enctype='multipart/form-data'>	<input type='file' class = 'fileup'name='filetoupload' onchange='submit("+progname+")'><br></form>";
+        $("table").append(appendic+ name+button+form2 + button2+ appendic2);
+
+      }
+  });
+  function submit(id) {
+    console.log("submitting");
+   document.getElementById(id).submit();
+ }
+</script>
+</body>
