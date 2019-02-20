@@ -170,7 +170,7 @@ a{
   text-align: left;
   display: inline-block;
   width: 300px;
-  margin-left: 50px;
+  margin-left: 32px;
 }
 #submit{
   text-align: center;
@@ -194,7 +194,7 @@ input{
 .uploadSpace3{
   position:absolute;
   top:103;
-  left: 700;
+  left: 742;
   color:red;
 }
 .versions{
@@ -202,7 +202,21 @@ input{
 }
 .version{
   margin-bottom: 30px;
+  border: 1px solid #dddddd;
+  padding: 20px;
 }
 button{
-  
+  background-color: Transparent;
+  outline: none;
+  overflow: hidden;
+  border: none;
+  font: inherit;
+  color: red;
+
+}
+button:hover{
+  color: #a80000;
+}
+.infotitle{
+  color: #515050;
 }

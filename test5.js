@@ -219,6 +219,7 @@ var filePather = function(version,name,oldpath,extension){
     if(extension == "psd"){
       fileConverter('./public/files/' + name + '/'+version);
     }
+    //TODO: galibrary upload returns to galibrary
     fileReader("/library.html",global_req,global_res);
   });
 }

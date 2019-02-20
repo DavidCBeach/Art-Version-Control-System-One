@@ -17,9 +17,13 @@
   <br>
   <h2 id="projectname"class="pagename"></h2>
 <a id = "library" href = "library.html">LIBRARY</a>
+
 <div class= 'uploadSpace3'>
   <span class= 'fileUpload'>UPLOAD FILE</span>
-    <input id = 'uploader'class='uploadForm' type='file' name='filetoupload'>
+  <form id ='filer' class='uploadForm'  action="/" method='post' enctype='multipart/form-data'>
+    <input type='file' class = 'fileup'name='filetoupload' onchange='submit()'>
+    <br>
+  </form>
   </div>
   </div>
   <div id= "topspacer">
@@ -32,6 +36,7 @@
 console.log("running");
 const urlParams = new URLSearchParams(window.location.search);
 const folder = urlParams.get('file');
+document.getElementById("filer").action = 'fileupload?name='+folder;
 $("h2").append(folder);
 $.get('/getinfo?file='+folder).done(function(data){
   info = data["info"];
@@ -43,10 +48,11 @@ $.get('/getinfo?file='+folder).done(function(data){
     path = folder+"/"+info[i]["version"]+".";
     var list1 = "<li class= 'version'><img src='/files/"+path+extension+"' height='300' width='auto'>";
     var date= new Date(parseInt(data["info"][(i).toString()]["date"]));
-    var list2 = "<p>"+date+"</p>";
+    var list2 = "<br><br><span class='infotitle'>Version: </span><span> "+info[i]["version"]+"</span><br><br>";
+    var list3 = "<span class='infotitle'>Date Uploaded: </span><span>"+date+"</span><br><br>";
     var nsdate = date.toString().split(" ").join("");
-    var list3 = "<button onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>Download</button></li>";
-    $("ul").append(list1+list2+list3);
+    var list4 = "<button onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button></li>";
+    $("ul").append(list1+list2+list3+list4);
   }
 });
 function downloadFile (path,name,dateversion){
@@ -55,4 +61,9 @@ function downloadFile (path,name,dateversion){
   window.open('/download?file='+path+'&name='+name+'&dateversion='+dateversion);
 
 }
+$("#uploader").onchange = function(){
+  console.log("submitting");
+ document.getElementById("filer").submit();
+};
+
 </script>
