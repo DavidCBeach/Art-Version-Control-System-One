@@ -18,6 +18,15 @@ body{
     width:auto;
     text-align: center;
 }
+#titlesNew{
+    position: fixed;
+    padding-left: 72px;
+    padding-right: 100px;
+    background-color: #f7f7ef;
+    z-index: 1;
+    width:auto;
+    text-align: center;
+}
 .title{
 
   font-size: 100px;
@@ -176,4 +185,24 @@ input{
 }
 #progUploadCon{
   text-align: center;
+}
+.pagename{
+  position:absolute;
+  top:70;
+  left:0;
+}
+.uploadSpace3{
+  position:absolute;
+  top:103;
+  left: 700;
+  color:red;
+}
+.versions{
+  padding-left: 0;
+}
+.version{
+  margin-bottom: 30px;
+}
+button{
+  
 }
