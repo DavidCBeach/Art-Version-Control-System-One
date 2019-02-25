@@ -4,6 +4,15 @@ body{
   background-color: #f7f7ef;
   color: #090554;
 }
+#back{
+  background-image: url("../images/index.jpg");
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  left: 0;
+}
+
 #shelf{
   width: 800px;
   display: inline-block;
@@ -87,7 +96,7 @@ th{
 tr{
   margin-left: 8px;
   text-align: right;
-  border: 1px solid #dddddd;
+  border: 3px solid #c4c4c4;
   margin-bottom: 50px;
 }
 .projectName{
@@ -96,10 +105,11 @@ tr{
   display: table-cell;
 }
 #whitespace{
+  left: 0;
   position: fixed;
   top: 0;
   width:100%;
-  height: 50px;
+  height: 130px;
   background-color: #f7f7ef;
   z-index: 1;
 }
@@ -202,7 +212,7 @@ input{
 }
 .version{
   margin-bottom: 30px;
-  border: 1px solid #dddddd;
+  border: 3px solid #aaa9a9;
   padding: 20px;
 }
 button{
