@@ -15,12 +15,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //difference showwer
 //multiple account support
 //Multiple files with same version number for project with multiple files
+//delete project/versions
 
 const hostname = '127.0.0.1';
 const port = 3000;
 
-let global_req;
-let global_res;
+let globalReq;
+let globalRes;
 
 //TODO: for file compare read in all pixel info and compare between versions
 //if there is difference color with highlight effect
@@ -28,40 +29,31 @@ let global_res;
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm();
-  global_req = req;
-  global_res = res;
+  globalReq = req;
+  globalRes = res;
   form.parse(req, function (err, fields, files) {
-
     fileAdd(files);
+  });
+});
 
-});
-});
 app.post('/progupload', (req, res) => {
-  //console.log(req.body);
   var form = new formidable.IncomingForm();
-  global_req = req;
-  global_res = res;
+  globalReq = req;
+  globalRes = res;
   form.parse(req, function (err, fields, files) {
     if(files.filetoupload.name && fields.progname){
       fileAdd(files,true,fields.progname);
     } else {
       fileReader("/newProject.html",req,res);
     }
-
+  });
 });
-});
-
 
 app.use(express.static('public'));
 
 app.get('/download', function(req, res){
   var file = "./public/files/"+ req.query.file;
-  res.download(file,req.query.name+req.query.dateversion); // Set disposition and send it.
-});
-
-
-app.get('/test', (req, res) => {
-  console.log(req.query.snake);
+  res.download(file,req.query.name+req.query.dateversion);
 });
 
 app.get('/getfiles', (req, res) => {
@@ -76,11 +68,11 @@ app.get('/getfiles', (req, res) => {
      if (err) {
        console.error(err.message);
      }
-     console.log(row);
      res.json({files:row});
   });
 
 });
+
 app.get('/getlatest', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -93,13 +85,9 @@ app.get('/getlatest', (req, res) => {
      if (err) {
        console.error(err.message);
      }
-     console.log(row);
      res.json({files:row});
   });
-
-
 });
-
 
 app.get('/getinfo', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -113,11 +101,8 @@ app.get('/getinfo', (req, res) => {
      if (err) {
        console.error(err.message);
      }
-     console.log(row);
      res.json({info:row});
   });
-
-
 });
 
 
@@ -130,9 +115,7 @@ app.get('/getfolders', (req, res) => {
       }
     }
    res.json({ folders: folders });
-
   });
-
 });
 
 app.get('/sqlfiles', (req, res) => {
@@ -147,10 +130,10 @@ app.get('/sqlfiles', (req, res) => {
      if (err) {
        console.error(err.message);
      }
-     console.log(row);
      res.json({files: row})
   });
 });
+
 app.get('/sqlprojects', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -163,7 +146,6 @@ app.get('/sqlprojects', (req, res) => {
      if (err) {
        console.error(err.message);
      }
-     console.log(row);
      res.json({files: row})
   });
 });
@@ -174,13 +156,13 @@ app.get('/*', (req, res) => {
     if(filename == "/"){
       filename = "/library.html";
     }
-    console.log(filename);
     fileReader(filename,req,res);
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`App listening on port ${port}!`));
 
 
+//opens db and extracts nessessary data for file upload
 var fileAdd = function(files,prog = false,progname = ""){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
@@ -190,24 +172,19 @@ var fileAdd = function(files,prog = false,progname = ""){
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-
   var filenameParts = filename.split('.');
   var length = filenameParts.length;
   var extension = filenameParts[length-1];
   filenameParts.length = length - 1;
   if(!prog){
-    name = global_req.query.name;
+    name = globalReq.query.name;
   } else {
     name = progname;
   }
-  console.log(global_req.query.name);
-
-  //TODO: input each file upload as new row and make get get the largest version of file to make the
-  // new row the next version. also file might be put into a folder with file name as folder name
-  // and each file named the version number
   fileInsert(db,name,extension,filepath);
 }
 
+//sets actual location of uploaded file
 var filePather = function(version,name,oldpath,extension){
   var newpath = './public/files/' + name + '/'+version +'.'+extension;
   var dir = './public/files/' + name;
@@ -220,33 +197,34 @@ var filePather = function(version,name,oldpath,extension){
       fileConverter('./public/files/' + name + '/'+version);
     }
     //TODO: galibrary upload returns to galibrary
-    fileReader("/library.html",global_req,global_res);
+    fileReader("/library.html",globalReq,globalRes);
   });
 }
 
+//inserts new file into EXISTING project
 var filesInsert = function(db,name,extension,version,id ){
   var date =  new Date();
   db.run(`INSERT INTO files(name,extension,version,date, project_id) VALUES(?,?,?,?,?)`, [name,extension,version,date,id], function(err) {
     if (err) {
       return console.log(err.message);
     }
-    console.log(version, id);
     db.run(`update projects set version = ? where id = ?`, [version,id], function(err) {
       if (err) {
         return console.log(err.message);
       }
-      console.log("updated");
+      console.log("project version updated");
     });
     date = null;
 
   });
 }
 
+//inserts file into NEW project
 var fileInsert = function(db,name,extension,filepath){
   db.get(`select id,version from projects where name = ? `,[name],
      (err, row) => {
      if (err) {
-       console.error("vsause error here",err.message);
+       console.error("vsause error here:",err.message);
      }
      if (row) {
        version = row.version + 1;
@@ -256,48 +234,48 @@ var fileInsert = function(db,name,extension,filepath){
     filePather(version,name,filepath,extension);
   } else {
     db.run('insert into projects(name,version) values(?,?)',[name,0], function(err) {
-      if (err) {console.error("vsause error here",err.message);}
+      if (err) {console.error("vsause error here:",err.message);}
       version = 0;
       db.get(`select id from projects where name = ? `,[name],
          (err, row) => {
          if (err) {
-           console.error("vsause error here",err.message);
+           console.error("vsause error here:",err.message);
          }
          id = row.id;
          filesInsert(db,name,extension,version,id);
          filePather(version,name,filepath,extension);
        });
-});
-}
-
+     });
+   }
   });
-
 }
 
 var fileReader = function(filename,req,res){
     filename = "./templates" + filename;
     fs.readFile(filename, function(err, data) {
-
+    //simple log and console output
     if (err) {
       res.writeHead(404, {'Content-Type': 'text/html'});
       console.log("[404] "+ req.url);
-      //fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+      //disable log by commenting out line below
+      fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
       return res.end("404 Not Found");
     }
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(data);
     console.log("[200] "+req.url);
-    //disabling log
-    //fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+    //disable log by commenting out line below
+    fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
     return res.end();
     });
 
   }
-
+//photoshop file converter
 var fileConverter = function(filename) {
-PSD.open(filename+".psd").then(function (psd) {
-  return psd.image.saveAsPng(filename+".png");
-}).then(function () {
-  console.log('Finished!');
-});
+  PSD.open(filename+".psd").then(function (psd) {
+    return psd.image.saveAsPng(filename+".png");
+  }).then(function () {
+    console.log('psd -> png coversion complete');
+  });
 }
+//thanks for taking a look at my code

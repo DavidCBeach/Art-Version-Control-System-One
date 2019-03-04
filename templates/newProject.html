@@ -1,47 +1,42 @@
 <head>
-   <meta charset="UTF-8">
-   <link rel="stylesheet" type="text/css" href="styles/style.css">
-   <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="styles/style.css">
+  <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
 </head>
 <body>
-    <div id= "back"></div>
+  <div id= "back"></div>
   <div id = "whitespace"></div>
   <div id = "shelf">
-
-  <div id = "titlesNew">
-    <span class = "title"> A.V.C.S. </span>
-    <span class = "subtitle">Art Version Control System</span>
-
-
-  <br>
-  <h2 class="pagename">New Project</h2>
-<a id = "library" href = "library.html">LIBRARY</a>
-  </div>
-  <div id= "topspacer">
-  </div>
-  <div id="progUploadCon">
-  <form name='progform' action='progupload' id= "progUpload" method='post' enctype='multipart/form-data'>
-    <span>Project Name: </span><input type='text' name='progname'>  <br> <br>
-    <span>Project File: </span>
-    <div class= 'uploadSpace2'>
-      <span class= 'fileUpload'>UPLOAD FILE</span>
-        <input id = 'uploader'class='uploadForm' type='file' name='filetoupload'>
-      </div>
-      <span id='checker'></span>
-    <br> <br>
-    <div id='submit'>
-    <input  id="submitter"type='submit' value ='Submit'>
+    <div id = "titlesNew">
+      <span class = "title"> A.V.C.S. </span>
+      <span class = "subtitle">Art Version Control System</span>
+      <br>
+      <h2 class="pagename">New Project</h2>
+      <a id = "library" href = "library.html">LIBRARY</a>
     </div>
-  </form>
+    <div id= "topspacer"></div>
+    <div id="progUploadCon">
+      <form name="progform" action="progupload" id= "progUpload" method="post" enctype="multipart/form-data">
+        <span>Project Name: </span><input type="text" name="progname">  <br> <br>
+        <span>Project File: </span>
+        <div class= "uploadSpace2">
+          <span class= "fileUpload">UPLOAD FILE</span>
+          <input id = "uploader"class="uploadForm" type="file" name="filetoupload">
+        </div>
+        <span id="checker"></span>
+        <br> <br>
+        <div id="submit">
+          <input  id="submitter"type="submit" value ="Submit">
+        </div>
+      </form>
+    </div>
   </div>
-
 </body>
 <script>
-var up = document.getElementById('uploader');
+var up = document.getElementById("uploader");
 up.onchange = function(){
   console.log(document.progform.filetoupload.value);
   var filename = document.progform.filetoupload.value
-  document.getElementById('checker').innerHTML = filename.split("\\")[2];
+  document.getElementById("checker").innerHTML = filename.split("\\")[2];
 };
-
 </script>

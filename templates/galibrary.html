@@ -1,45 +1,39 @@
 <head>
-   <meta charset="UTF-8">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css" href="styles/style.css">
-<link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
+  <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/style.css">
+  <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
 </head>
-
 <body>
   <div id= "back"></div>
   <div id = "whitespace"></div>
   <div id = "shelf">
-
-  <div id = "titles">
-    <span class = "title"> A.V.C.S. </span>
-    <span class = "subtitle">Art Version Control System</span>
-
-
-  <br>
-  <h2 id="projectname"class="pagename"></h2>
-<a id = "library" href = "library.html">LIBRARY</a>
-
-<div class= 'uploadSpace3'>
-  <span class= 'fileUpload'>UPLOAD FILE</span>
-  <form id ='filer' class='uploadForm'  action="/" method='post' enctype='multipart/form-data'>
-    <input type='file' class = 'fileup'name='filetoupload' onchange='submit()'>
-    <br>
-  </form>
+    <div id = "titles">
+      <span class = "title"> A.V.C.S. </span>
+      <span class = "subtitle">Art Version Control System</span>
+      <br>
+      <h2 id="projectname"class="pagename"></h2>
+      <a id = "library" href = "library.html">LIBRARY</a>
+      <div class= "uploadSpace3">
+        <span class= "fileUpload">UPLOAD FILE</span>
+        <form id ="filer" class="uploadForm"  action="/" method="post" enctype="multipart/form-data">
+          <input type="file" class = "fileup"name="filetoupload" onchange="submit()">
+          <br>
+        </form>
+      </div>
+    </div>
+    <div id= "topspacer"></div>
+    <ul class= "versions"></ul>
   </div>
-  </div>
-  <div id= "topspacer">
-  </div>
-
-<ul class= "versions">
-  </ul>
 </body>
 <script>
 console.log("running");
 const urlParams = new URLSearchParams(window.location.search);
-const folder = urlParams.get('file');
-document.getElementById("filer").action = 'fileupload?name='+folder;
+const folder = urlParams.get("file");
+document.getElementById("filer").action = "fileupload?name="+folder;
 $("h2").append(folder);
-$.get('/getinfo?file='+folder).done(function(data){
+//populating version list
+$.get("/getinfo?file="+folder).done(function(data){
   info = data["info"];
   for(i = 0; i < info.length; i++){
     var extension = info[i]["extension"];
@@ -58,13 +52,10 @@ $.get('/getinfo?file='+folder).done(function(data){
 });
 function downloadFile (path,name,dateversion){
   console.log("download intiated",info[0]["extension"]);
-  //download(folder, "./public/files/"+path, "image/"+info[i]["extension"]);
-  window.open('/download?file='+path+'&name='+name+'&dateversion='+dateversion);
-
+  window.open("/download?file="+path+"&name="+name+"&dateversion="+dateversion);
 }
 $("#uploader").onchange = function(){
   console.log("submitting");
  document.getElementById("filer").submit();
 };
-
 </script>
