@@ -1,5 +1,5 @@
 # Art-Version-Control-System-One
-Art Version Control System One is a project with the intent of creating a version control system for files pertaining to visual medium. This is a website that allows the user to upload their project file in order to create a back up of that version of their project. As the user continues to work on their project they upload the file when they have made progress that they want to back up to there AVCS project. The user can then view each version of each project and download any version they desire. This system allows the user to see the progression of their project and also easily revert back to a pervious version of their project. 
+Art Version Control System One is a project with the intent of creating a version control system for files pertaining to visual medium. This is a website that allows the user to upload their project file in order to create a back up of that version of their project. As the user continues to work on their project they upload the file when they have made progress that they want to back up to there AVCS project. The user can then view each version of each project and download any version they desire. This system allows the user to see the progression of their project and also easily revert back to a pervious version of their project.
 
 ## Instructions
 ### Dependencies:
@@ -18,6 +18,8 @@ Art Version Control System One is a project with the intent of creating a versio
   - upload files to new project
   - download any version of existing project
   - view upload time and date information for versions of project
+### Currently Known Bugs:
+  - upload file button on home page (library.html) not completing upload on some psd files
 ## Future Plans
 In Future I would like to implement functionality such as:
   - support for multiple accounts
@@ -25,4 +27,3 @@ In Future I would like to implement functionality such as:
   - version deletion
   - multi file versions
   - hosted
-  
