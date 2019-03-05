@@ -16,6 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //multiple account support
 //Multiple files with same version number for project with multiple files
 //delete project/versions
+//allow project names to contain spaces
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -41,7 +42,7 @@ app.post('/progupload', (req, res) => {
   globalReq = req;
   globalRes = res;
   form.parse(req, function (err, fields, files) {
-    if(files.filetoupload.name && fields.progname){
+    if((files.filetoupload.name && fields.progname)&&(!fields.progname.includes(" "))){
       fileAdd(files,true,fields.progname);
     } else {
       fileReader("/newProject.html",req,res);

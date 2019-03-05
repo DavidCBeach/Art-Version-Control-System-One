@@ -12,7 +12,9 @@ body{
   z-index: -2;
   left: 0;
 }
-
+#prognameguide{
+  color:grey;
+}
 #shelf{
   width: 800px;
   display: inline-block;

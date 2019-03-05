@@ -17,13 +17,15 @@
     <div id= "topspacer"></div>
     <div id="progUploadCon">
       <form name="progform" action="progupload" id= "progUpload" method="post" enctype="multipart/form-data">
-        <span>Project Name: </span><input type="text" name="progname">  <br> <br>
+        <span>Project Name: </span><input type="text" name="progname"> <br> <span id='prognameguide'>Project name must contain no spaces.</span><br>
         <span>Project File: </span>
         <div class= "uploadSpace2">
           <span class= "fileUpload">UPLOAD FILE</span>
           <input id = "uploader"class="uploadForm" type="file" name="filetoupload">
         </div>
         <span id="checker"></span>
+        <br> <span id='prognameguide'>Project file should be initial version of project</span>
+
         <br> <br>
         <div id="submit">
           <input  id="submitter"type="submit" value ="Submit">
