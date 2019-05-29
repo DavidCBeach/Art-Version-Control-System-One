@@ -3,6 +3,12 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <link rel="stylesheet" type="text/css" href="styles/style.css">
   <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet">
+  <!-- UIkit CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/css/uikit.min.css" />
+
+<!-- UIkit JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/js/uikit.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.5/js/uikit-icons.min.js"></script>
 </head>
 <body>
   <div id= "back"></div>
@@ -12,8 +18,16 @@
       <span class = "title"> A.V.C.S. </span>
       <span class = "subtitle">Art Version Control System</span>
       <br>
-      <h2 id="projectname"class="pagename"></h2>
-      <a id = "library" href = "library.html">LIBRARY</a>
+
+      <nav class="uk-navbar-container" uk-navbar>
+          <div class="uk-navbar-left">
+              <ul class="uk-navbar-nav">
+                  <li ><a href="library.html">LIBRARY</a></li>
+                  <li ><a href="newProject.html">ADD PROJECT</a></li>
+                  <li class="uk-active"><a id="projectname"class="pagename"></a></li>
+              </ul>
+          </div>
+      </nav>
       <div class= "uploadSpace3">
         <span class= "fileUpload">UPLOAD FILE</span>
         <form id ="filer" class="uploadForm"  action="/" method="post" enctype="multipart/form-data">
@@ -23,7 +37,7 @@
       </div>
     </div>
     <div id= "topspacer"></div>
-    <ul class= "versions"></ul>
+    <ul  id="versions" class= "versions"></ul>
   </div>
 </body>
 <script>
@@ -31,7 +45,7 @@ console.log("running");
 const urlParams = new URLSearchParams(window.location.search);
 const folder = urlParams.get("file");
 document.getElementById("filer").action = "fileupload?name="+folder;
-$("h2").append(folder);
+$("#projectname").append(folder);
 //populating version list
 $.get("/getinfo?file="+folder).done(function(data){
   info = data["info"];
@@ -47,7 +61,7 @@ $.get("/getinfo?file="+folder).done(function(data){
     var list3 = "<span class='infotitle'>Date Uploaded: </span><span>"+date+"</span><br><br>";
     var nsdate = date.toString().split(" ").join("");
     var list4 = "<button onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button></li>";
-    $("ul").append(list1+list2+list3+list4);
+    $("#versions").append(list1+list2+list3+list4);
   }
 });
 function downloadFile (path,name,dateversion){
