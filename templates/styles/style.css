@@ -1,234 +1,52 @@
-body{
-  text-align: center;
-  font-family: 'Yanone Kaffeesatz', sans-serif;
-  background-color: #f7f7ef;
-  color: #090554;
+.title{
+  padding-left: 8px;
 }
 #back{
-  background-image: url("../images/index.jpg");
   position: fixed;
   width: 100%;
   height: 100%;
   z-index: -2;
   left: 0;
 }
-#prognameguide{
-  color:grey;
-}
-#shelf{
-  width: 800px;
-  display: inline-block;
-  text-align: center;
-}
-#titles{
-    position: fixed;
-    padding-left: 80px;
-    padding-right: 100px;
-    background-color: #f7f7ef;
-    z-index: 1;
-    width:auto;
-    text-align: center;
-}
-#titlesNew{
-    position: fixed;
-    padding-left: 72px;
-    padding-right: 100px;
-    background-color: #f7f7ef;
-    z-index: 1;
-    width:auto;
-    text-align: center;
-}
-.title{
-
-  font-size: 100px;
-}
-.subtitle{
-  font-size: 50px;
-}
-table{
-  width: 100%;
-  text-align: center;
-  list-style-type: none;
-  font-size: 15px;
-  font-style: normal;
-  border-collapse: collapse;
-}
-ul{
-  list-style: none;
-}
-th{
-  width:400px;
-  font-weight: normal;
-  text-align: left;
-  padding: 8px;
-  padding-left: 0px;
-
-}
-.uploadrow{
-  width:auto;
-  display:inline-block;
-  text-align: right;
-}
-#myformone {
-  position: absolute;
-    top: 50px;
-    left: 0;
-  height: 100%;
-  width: 100%;
-}
-.progclick{
-  width: 100%;
-  padding-right: 50px;
-  height: 50px;
-  display: block
-}
-#fileholder {
-  height: inherit;
-  width:inherit;
-  opacity: 0;
-}
 .preview{
   height: 50px;
   width:auto;
   margin-left: 8px;
 }
-.fileup{
-
+#addContainer{
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
 }
-tr{
-  margin-left: 8px;
-  text-align: right;
-  border: 3px solid #c4c4c4;
-  margin-bottom: 50px;
-}
-.projectName{
-  padding-top: 15px;
-  font-size: 20px;
-  display: table-cell;
-}
-#whitespace{
-  left: 0;
-  position: fixed;
-  top: 0;
-  width:100%;
-  height: 130px;
-  background-color: #f7f7ef;
-  z-index: 1;
-}
-#newProject{
-  text-decoration: none;
-  color: red;
-}
-#newProject:hover{
-  color:#a80000;
-}
-#library{
-  text-decoration: none;
-  color: red;
-}
-#library:hover{
-  color:#a80000;
-}
-a{
-  text-decoration: none;
-  color:#2b2b2b;
-}
-.uploadForm{
-  opacity: 0;
-  width: inherit;
-  height: inherit;
-}
-.uploadSpace{
-  width: 58px;
-  height:15px;
-  position: relative;
-  color:red;
-  text-align: right;
-}
-.uploadSpace2{
-  width: 58px;
-  height:15px;
-  position: relative;
-  color:red;
-  text-align: right;
-  display: inline;
-}
-.fileUpload{
-  top: 0;
-    left: 0;
-    width: 58px;
-    height:15px;
-    position:absolute;
-    color:inherit;
-}
-.uploadSpace:hover{
-  color:#a80000;
-}
-.uploadSpace2:hover{
-  color:#a80000;
-}
-
-.fileup{
-  top: 0;
-    left: 0;
-    width: 58px;
-    height:15px;
-    position: absolute;
-}
-#topspacer{
-  height: 140;
-}
-#progUpload{
-  text-align: left;
-  display: inline-block;
-  width: 300px;
-  margin-left: 32px;
+th{
+    text-align: center !important;
+    vertical-align:middle !important;
 }
 #submit{
-  text-align: center;
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
 }
-#submitter{
-  margin-right: 50px;
+/*uploadfilebutton ~~ here be dragons*/
+.uploadFormproject{
+  display: none;
 }
-input{
-  border-style: hidden;
-  font: inherit;
-
+.uploadForm{
+  display: none;
 }
 #progUploadCon{
-  text-align: center;
-}
-.pagename{
-  position:absolute;
-  top:70;
-  left:0;
-}
-.uploadSpace3{
-  position:absolute;
-  top:103;
-  left: 742;
-  color:red;
-}
-.versions{
-  padding-left: 0;
-}
-.version{
-  margin-bottom: 30px;
-  border: 3px solid #aaa9a9;
-  padding: 20px;
-}
-button{
-  background-color: Transparent;
-  outline: none;
-  overflow: hidden;
-  border: none;
-  font: inherit;
-  color: red;
+ margin-bottom: 60px;
 
 }
-button:hover{
-  color: #a80000;
+img{
+  width:400px;
+  height:auto;
 }
-.infotitle{
-  color: #515050;
+ul{
+  list-style: none;
+  text-align: center;
+}
+#search{
+    vertical-align:middle !important;
+    padding-top:20px;
 }
