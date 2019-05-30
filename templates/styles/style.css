@@ -22,11 +22,31 @@ th{
     text-align: center !important;
     vertical-align:middle !important;
 }
-
+#submit{
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+}
 /*uploadfilebutton ~~ here be dragons*/
 .uploadFormproject{
   display: none;
 }
 .uploadForm{
   display: none;
+}
+#progUploadCon{
+ margin-bottom: 60px;
+
+}
+img{
+  width:400px;
+  height:auto;
+}
+ul{
+  list-style: none;
+  text-align: center;
+}
+#search{
+    vertical-align:middle !important;
+    padding-top:20px;
 }

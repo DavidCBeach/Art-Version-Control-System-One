@@ -23,21 +23,35 @@
           <div class="uk-navbar-left">
               <ul class="uk-navbar-nav">
                   <li ><a href="library.html">LIBRARY</a></li>
-                  <li ><a href="newProject.html">ADD PROJECT</a></li>
                   <li class="uk-active"><a id="projectname"class="pagename"></a></li>
               </ul>
           </div>
+          <div class="uk-navbar-right">
+
+              <ul class="uk-navbar-nav">
+                <li id="search">
+                    <form  class="uk-search uk-search-default">
+                        <input class="uk-search-input" type="search" placeholder="Search...">
+                    </form>
+                </li>
+                <li><a href="#">Sign in</a></li>
+
+              </ul>
+
+          </div>
       </nav>
+      <div id="addContainer">
+        <button class="uk-button uk-button-primary uk-margin-small-right" onclick="uploaderActivate()" type="button" >Upload File</button>
+      </div>
       <div class= "uploadSpace3">
-        <span class= "fileUpload">UPLOAD FILE</span>
         <form id ="filer" class="uploadForm"  action="/" method="post" enctype="multipart/form-data">
-          <input type="file" class = "fileup"name="filetoupload" onchange="submit()">
+          <input type="file" id = "uploader" class = "fileup"name="filetoupload" onchange="submit()">
           <br>
         </form>
       </div>
     </div>
     <div id= "topspacer"></div>
-    <ul  id="versions" class= "versions"></ul>
+    <ul  id="versions" class= "uk-list uk-list-striped versions"></ul>
   </div>
 </body>
 <script>
@@ -60,7 +74,7 @@ $.get("/getinfo?file="+folder).done(function(data){
     var list2 = "<br><br><span class='infotitle'>Version: </span><span> "+info[i]["version"]+"</span><br><br>";
     var list3 = "<span class='infotitle'>Date Uploaded: </span><span>"+date+"</span><br><br>";
     var nsdate = date.toString().split(" ").join("");
-    var list4 = "<button onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button></li>";
+    var list4 = "<button class='uk-button uk-button-default' onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button></li>";
     $("#versions").append(list1+list2+list3+list4);
   }
 });
@@ -72,4 +86,8 @@ $("#uploader").onchange = function(){
   console.log("submitting");
  document.getElementById("filer").submit();
 };
+function uploaderActivate(){
+    var upfile = document.getElementById("uploader");
+    upfile.click();
+}
 </script>
