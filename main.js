@@ -49,6 +49,18 @@ app.post('/progupload', (req, res) => {
     }
   });
 });
+app.post('/signin', (req, res) => {
+  console.log("fields.username");
+  var form = new formidable.IncomingForm();
+  form.parse(req, function (err, fields, files) {
+    console.log(fields.username);
+    console.log(fields.password);
+    //TODO: add username to session and verify and push to db username and passwords
+    //also add deleting to db
+    //this is going to involve reworking the database 
+  });
+  fileReader("/library.html",req,res);
+});
 
 app.use(express.static('public'));
 

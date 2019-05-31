@@ -42,12 +42,34 @@
                         <input class="uk-search-input" type="search" placeholder="Search...">
                     </form>
                 </li>
-                <li><a href="#">Sign in</a></li>
-
+                <li id="signin"><a uk-toggle="target: #sign" type="button" href="#">Sign in</a></li>
+                <li id="signout"><a href="#">Sign out</a></li>
               </ul>
 
           </div>
       </nav>
+      <div id="sign" uk-modal>
+          <div class="uk-modal-dialog uk-modal-body">
+            <ul class="uk-subnav uk-subnav-pill" uk-switcher>
+                <li><a href="#">Sign in</a></li>
+                <li><a href="#">Sign up</a></li>
+            </ul>
+
+            <ul class="uk-switcher uk-margin">
+                <li>
+                  <form name="signingform" action="signin" id= "progUpload" method="post" enctype="multipart/form-data">
+                    <span>Username: </span><input type="text" name="progname">
+                    <span>Password: </span><input type="text" name="progname">
+
+                      <input   class='uk-button uk-button-primary' id="signinsub"type="submit" value ="Submit">
+                  </form>
+                  <button class="uk-modal-close uk-button uk-button-primary" onclick="clickSubmit()"type="button">Submit</button>
+                </li>
+                <li>Hello again!</li>
+            </ul>
+
+          </div>
+      </div>
       <div id="addContainer">
         <button class="uk-button uk-button-primary uk-margin-small-right" onclick="uploaderActivate()" type="button" >Upload File</button>
         <div id="deleteProjectButton" class="uk-inline">
@@ -99,6 +121,10 @@ function setViewMode(){
   }
 }
 
+function clickSubmit(){
+  var upfile = document.getElementById("signinsub");
+  upfile.click();
+}
 
 
 console.log("running");
@@ -121,10 +147,11 @@ $.get("/getinfo?file="+folder).done(function(data){
     var list3 = "<span class='infotitle'>Date Uploaded: </span><span>"+date+"</span><br><br>";
     var nsdate = date.toString().split(" ").join("");
     var list4 = "<button class='uk-button uk-button-default' onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button>"
-    var list5 ='<div class="deleteButton uk-inline"><button class="uk-button uk-button-danger uk-margin-small-right" type="button" >Delete</button><div uk-dropdown="mode: click"><p> WARNING: This will delete this version perminately from your project.</p><button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteFile('+info[i]["version"]+','+info[i]["id"]+')" type="button" >Confirm Delete Version</button></div></div></li>';
+    var list5 ='<div class="deleteButton uk-inline"><button class="uk-button uk-button-danger uk-margin-small-right" type="button" >Delete</button><div uk-dropdown="mode: click"><p> WARNING: This will delete this version perminately from your project.</p><button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteFile('+info[i]["version"]+','+info[i]["id"]+')" type="button" >Delete</button></div></div></li>';
     $("#versions").append(list1+list2+list3+list4+list5);
   }
 });
+
 function downloadFile (path,name,dateversion){
   console.log("download intiated",info[0]["extension"]);
   window.open("/download?file="+path+"&name="+name+"&dateversion="+dateversion);

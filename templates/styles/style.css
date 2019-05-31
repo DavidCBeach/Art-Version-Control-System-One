@@ -57,3 +57,12 @@ ul{
   margin-left: 20px !important;
   display:none !important;
 }
+#signout{
+  display:none;
+}
+#signinsub{
+  display:none;
+}
+.signing{
+  text-align: left;
+}
