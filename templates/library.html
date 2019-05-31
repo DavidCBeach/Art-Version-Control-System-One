@@ -34,14 +34,47 @@
                       <input class="uk-search-input" type="search" placeholder="Search...">
                   </form>
               </li>
-              <li><a href="#">Sign in</a></li>
-
+              <li id="signin"><a uk-toggle="target: #sign" type="button" href="#">Sign in</a></li>
+              <li id="signout"><a href="#">Sign out</a></li>
             </ul>
 
         </div>
     </nav>
+    <div id="sign" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body">
+          <ul class="uk-subnav uk-subnav-pill" uk-switcher>
+              <li><a href="#">Sign in</a></li>
+              <li><a href="#">Sign up</a></li>
+          </ul>
+
+          <ul class="uk-switcher uk-margin">
+              <li class="signing">
+                <form name="signingform" action="signin" id= "signingform" method="post" enctype="multipart/form-data">
+                  <span>Username: </span><input type="text" name="username">
+                  <br><br>
+                  <span>Password: </span><input type="password" name="password">
+
+                    <input   class='uk-button uk-button-primary' id="signinsub"type="submit" value ="Submit">
+                </form>
+                <button class="uk-modal-close uk-button uk-button-primary" onclick="clickSubmit()"type="button">Submit</button>
+              </li>
+              <li class="signing">
+                <form name="signupform" action="signup" id= "signupform" method="post" enctype="multipart/form-data">
+                  <span>Username: </span><input type="text" name="username">
+                  <span><br>
+                  <span>Password: </span><input type="password" name="password">
+
+                    <input   class='uk-button uk-button-primary' id="signinsubup"type="submit" value ="Submit">
+                </form>
+                <button class="uk-modal-close uk-button uk-button-primary" onclick="clickSubmitup()"type="button">Submit</button>
+              </li>
+
+          </ul>
+
+        </div>
+        </div>
     <div id="addContainer">
-      <button class="uk-button uk-button-danger uk-margin-small-right" type="button" uk-toggle="target: #modal-example">Add Project</button>
+      <button class="uk-button uk-button-secondary uk-margin-small-right" type="button" uk-toggle="target: #modal-example">Add Project</button>
     </div>
   <table class="uk-table uk-table-responsive uk-table-divider"></table>
   <div id="modal-example" uk-modal>
@@ -85,6 +118,14 @@ $.get('/getlatest').done(function(data){
       $("table").append(appendic+ name+button+form2 + button2+ appendic2);
     }
   });
+  function clickSubmit(){
+    var uprfile = document.getElementById("signinsub");
+    uprfile.click();
+  }
+  function clickSubmitup(){
+    var upgfile = document.getElementById("signinsubup");
+    upgfile.click();
+  }
   function submit(id) {
     console.log("submitting");
     document.getElementById(id).submit();

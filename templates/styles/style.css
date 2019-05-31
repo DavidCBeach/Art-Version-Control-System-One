@@ -50,3 +50,19 @@ ul{
     vertical-align:middle !important;
     padding-top:20px;
 }
+#deleteProjectButton{
+  display: none;
+}
+.deleteButton{
+  margin-left: 20px !important;
+  display:none !important;
+}
+#signout{
+  display:none;
+}
+#signinsub{
+  display:none;
+}
+.signing{
+  text-align: left;
+}
