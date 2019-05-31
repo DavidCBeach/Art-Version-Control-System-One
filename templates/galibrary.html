@@ -27,8 +27,8 @@
                   <a id="projectname"class="pagename" href="#"></a>
                 <div class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
-                        <li class="uk-active"><a href="#">View Mode</a></li>
-                        <li><a href="#">Edit Mode</a></li>
+                        <li id="viewMode" class="uk-active"><a onclick="setViewMode()" href="#">View Mode</a></li>
+                        <li id="editMode" ><a onclick="setEditMode()" href="#">Edit Mode</a></li>
                     </ul>
                 </div>
                 </li>
@@ -50,6 +50,14 @@
       </nav>
       <div id="addContainer">
         <button class="uk-button uk-button-primary uk-margin-small-right" onclick="uploaderActivate()" type="button" >Upload File</button>
+        <div id="deleteProjectButton" class="uk-inline">
+            <button class="uk-button uk-button-danger uk-margin-small-right" type="button" >Delete Project</button>
+            <div uk-dropdown="mode: click">
+              <p> WARNING: This will delete your project perminately from your library.</p>
+                  <button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteProject()" type="button" >Confirm Delete Project</button>
+
+            </div>
+        </div>
       </div>
       <div class= "uploadSpace3">
         <form id ="filer" class="uploadForm"  action="/" method="post" enctype="multipart/form-data">
@@ -63,6 +71,36 @@
   </div>
 </body>
 <script>
+
+function setEditMode(){
+  var editMode = document.getElementById("editMode");
+  editMode.className = "uk-active";
+  var viewMode = document.getElementById("viewMode");
+  viewMode.className = "";
+  var deleteProjectButton = document.getElementById("deleteProjectButton");
+  deleteProjectButton.style.cssText = "display: inline;"
+  var deleteFileButtons = document.getElementsByClassName("deleteButton");
+  for(i=0;i < deleteFileButtons.length; i++){
+    console.log("hiding");
+    deleteFileButtons[i].style.cssText = "display: inline !important;"
+  }
+}
+function setViewMode(){
+  var viewMode = document.getElementById("viewMode");
+  viewMode.className = "uk-active";
+  var editMode = document.getElementById("editMode");
+  editMode.className = "";
+  var deleteProjectButton = document.getElementById("deleteProjectButton");
+  deleteProjectButton.style.cssText = "display: none;"
+  var deleteFileButtons = document.getElementsByClassName("deleteButton");
+  for(i=0;i < deleteFileButtons.length; i++){
+    console.log("hiding");
+    deleteFileButtons[i].style.cssText = "display: none !important;"
+  }
+}
+
+
+
 console.log("running");
 const urlParams = new URLSearchParams(window.location.search);
 const folder = urlParams.get("file");
@@ -82,8 +120,9 @@ $.get("/getinfo?file="+folder).done(function(data){
     var list2 = "<br><br><span class='infotitle'>Version: </span><span> "+info[i]["version"]+"</span><br><br>";
     var list3 = "<span class='infotitle'>Date Uploaded: </span><span>"+date+"</span><br><br>";
     var nsdate = date.toString().split(" ").join("");
-    var list4 = "<button class='uk-button uk-button-default' onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button></li>";
-    $("#versions").append(list1+list2+list3+list4);
+    var list4 = "<button class='uk-button uk-button-default' onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button>"
+    var list5 ='<div class="deleteButton uk-inline"><button class="uk-button uk-button-danger uk-margin-small-right" type="button" >Delete</button><div uk-dropdown="mode: click"><p> WARNING: This will delete this version perminately from your project.</p><button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteFile('+info[i]["version"]+','+info[i]["id"]+')" type="button" >Confirm Delete Version</button></div></div></li>';
+    $("#versions").append(list1+list2+list3+list4+list5);
   }
 });
 function downloadFile (path,name,dateversion){
