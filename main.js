@@ -57,7 +57,8 @@ app.post('/signin', (req, res) => {
     console.log(fields.password);
     //TODO: add username to session and verify and push to db username and passwords
     //also add deleting to db
-    //this is going to involve reworking the database 
+    //this is going to involve reworking the database
+    //switch file system to 
   });
   fileReader("/library.html",req,res);
 });
