@@ -1,14 +1,28 @@
 const http = require('http');
 var express = require("express");
-const app = express()
+var session = require('express-session')
+const app = express();
 var url = require('url');
 var fs = require('fs');
 var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
+var crypto = require('crypto');
+var encryptpass = require('./custom_modules/encrypt.mjs');
+algorithm = 'aes-256-ctr';
+password = encryptpass.password();
 var PSD = require('psd');
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
+app.set('trust proxy', 1) // trust first proxy
+
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 60000 }
+}))
+
 
 
 //TODO:
@@ -49,20 +63,87 @@ app.post('/progupload', (req, res) => {
     }
   });
 });
+function encrypt(text){
+  var cipher = crypto.createCipher(algorithm,password)
+  var crypted = cipher.update(text,'utf8','hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+function decrypt(text){
+  var decipher = crypto.createDecipher(algorithm,password)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
 app.post('/signin', (req, res) => {
-  console.log("fields.username");
+  console.log("signin");
+  var ssn = req.session;
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
   var form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
-    console.log(fields.username);
-    console.log(fields.password);
+  var password = encrypt(fields.password);
+  var username = fields.username;
+  console.log(password, username)
+  db.get(`select * from accounts where username = ? and password = ? `,[username,password],
+     (err, row) => {
+     if (err) {
+       console.error("vsause error here:",err.message);
+     }
+     if (row) {
+       console.log("signed in");
+       req.session.cat = "wow2";
+       req.session.save(function(err) {
+          // session saved
+        })
+
+  } else {
+
+   }
+  });
+
     //TODO: add username to session and verify and push to db username and passwords
     //also add deleting to db
     //this is going to involve reworking the database
-    //switch file system to 
+    //switch file system to
   });
   fileReader("/library.html",req,res);
 });
+app.post('/signup', (req, res) => {
+  console.log("signup");
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+  var form = new formidable.IncomingForm();
+  form.parse(req, function (err, fields, files) {
+  var password = encrypt(fields.password);
+  var username = fields.username;
+  db.get(`select * from accounts where username = ? `,[username],
+     (err, row) => {
+     if (err) {
+       console.error("vsause error here:",err.message);
+     }
+     if (row) {
+       fileReader("/library.html",req,res);
+  } else {
+    db.run('insert into accounts(username,password) values(?,?)',[username,password], function(err) {
+      if (err) {console.error("vsause error here:",err.message);}
+      console.log("user added");
 
+     });
+   }
+  });
+
+  });
+  fileReader("/library.html",req,res);
+});
 app.use(express.static('public'));
 
 app.get('/download', function(req, res){
@@ -84,7 +165,6 @@ app.get('/getfiles', (req, res) => {
      }
      res.json({files:row});
   });
-
 });
 
 app.get('/getlatest', (req, res) => {
@@ -99,8 +179,12 @@ app.get('/getlatest', (req, res) => {
      if (err) {
        console.error(err.message);
      }
-     res.json({files:row});
+
+     res.json({files:row,cat:req.session.cat});
   });
+});
+app.get('/getcat', (req, res) => {
+    res.json({cat:req.session.cat});
 });
 
 app.get('/getinfo', (req, res) => {
@@ -163,10 +247,26 @@ app.get('/sqlprojects', (req, res) => {
      res.json({files: row})
   });
 });
+app.get('/sqlaccounts', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from accounts`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     res.json({files: row})
+  });
+});
 
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
+    req.session.cat;
     if(filename == "/"){
       filename = "/library.html";
     }

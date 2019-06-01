@@ -14,6 +14,7 @@
 
 </head>
 <body>
+
     <span class = "title"> A.V.C.S. </span>
     <span class = "subtitle">Art Version Control System</span>
     <br>
@@ -61,7 +62,7 @@
               <li class="signing">
                 <form name="signupform" action="signup" id= "signupform" method="post" enctype="multipart/form-data">
                   <span>Username: </span><input type="text" name="username">
-                  <span><br>
+                  <br><br>
                   <span>Password: </span><input type="password" name="password">
 
                     <input   class='uk-button uk-button-primary' id="signinsubup"type="submit" value ="Submit">
@@ -96,6 +97,7 @@
       </div>
     </div>
 </div>
+{{# cat }}
 </body>
 <script>
 //Populates library table
@@ -118,6 +120,7 @@ $.get('/getlatest').done(function(data){
       $("table").append(appendic+ name+button+form2 + button2+ appendic2);
     }
   });
+
   function clickSubmit(){
     var uprfile = document.getElementById("signinsub");
     uprfile.click();
@@ -145,7 +148,6 @@ function uploaderActivate(id){
     var upfile = document.getElementById(id);
     upfile.click();
 }
-
 
 
 </script>
