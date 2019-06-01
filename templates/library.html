@@ -36,7 +36,7 @@
                   </form>
               </li>
               <li id="signin"><a uk-toggle="target: #sign" type="button" href="#">Sign in</a></li>
-              <li id="signout"><a href="#">Sign out</a></li>
+              <li id="signout"><a onclick="signout()" href="#">Sign out</a></li>
             </ul>
 
         </div>
@@ -97,7 +97,6 @@
       </div>
     </div>
 </div>
-{{# cat }}
 </body>
 <script>
 //Populates library table
@@ -109,10 +108,10 @@ $.get('/getlatest').done(function(data){
       if(extension == "psd"){
         extension = "png";
       }
-      path = info[i]["name"]+"/"+info[i]["version"]+".";
-      var appendic = "<tr><th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["name"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'></a></th>";
+      path = info[i]["[project_id"]+"/"+info[i]["version"]+".";
+      var appendic = "<tr><th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'></a></th>";
       var  appendic2 = "</tr>";
-      var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["name"]+"'><span>"+info[i]["name"]+"</span></a></th>";
+      var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><span>"+info[i]["name"]+"</span></a></th>";
       var progname = info[i]["name"];
       var button = "<th class = 'uploadrow'><div class= 'uploadSpace'><button onclick='uploaderActivate("+info[i]["project_id"]+")'class='uk-button uk-button-default'>Upload File</button>";
       var button2 = "</div></th>";
@@ -120,7 +119,26 @@ $.get('/getlatest').done(function(data){
       $("table").append(appendic+ name+button+form2 + button2+ appendic2);
     }
   });
+  $.get("/getaccount").done(function(data){
+    if(data.account != -1 && data.account){
+      console.log(data);
+      var siginbutton = document.getElementById("signin");
+      siginbutton.style.cssText = "display: none;"
+      var sigoutbutton = document.getElementById("signout");
+      sigoutbutton.style.cssText = "display: inline;"
+    } else {
+      var siginbutton = document.getElementById("signin");
+      siginbutton.style.cssText = "display: inline;"
+      var sigoutbutton = document.getElementById("signout");
+      sigoutbutton.style.cssText = "display: none;"
+    }
+  });
 
+  function signout(){
+    $.get("/signout").done(function(data){
+
+    });
+  }
   function clickSubmit(){
     var uprfile = document.getElementById("signinsub");
     uprfile.click();

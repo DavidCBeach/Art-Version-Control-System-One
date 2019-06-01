@@ -96,7 +96,7 @@ app.post('/signin', (req, res) => {
      }
      if (row) {
        console.log("signed in");
-       req.session.cat = "wow2";
+       req.session.account = row.id;
        req.session.save(function(err) {
           // session saved
         })
@@ -174,19 +174,25 @@ app.get('/getlatest', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-    db.all(`select * from projects, files where projects.id = files.project_id and projects.version = files.version`,
+  if(req.session.account){
+    db.all(`select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version) where account_id = ?`,[req.session.account],
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
 
-     res.json({files:row,cat:req.session.cat});
+     res.json({files:row});
   });
-});
-app.get('/getcat', (req, res) => {
-    res.json({cat:req.session.cat});
-});
+  }
 
+});
+app.get('/getaccount', (req, res) => {
+    res.json({account:req.session.account});
+});
+app.get('/signout', (req, res) => {
+    req.session.account = -1;
+    res.redirect("library.html");
+});
 app.get('/getinfo', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -266,7 +272,7 @@ app.get('/sqlaccounts', (req, res) => {
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
-    req.session.cat;
+
     if(filename == "/"){
       filename = "/library.html";
     }

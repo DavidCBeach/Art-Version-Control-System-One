@@ -151,8 +151,10 @@ $.get("/getinfo?file="+folder).done(function(data){
     $("#versions").append(list1+list2+list3+list4+list5);
   }
 });
-$.get("/getcat").done(function(data){
-  console.log(data);
+$.get("/getaccount").done(function(data){
+  if(data){
+    console.log(data);
+  }
 });
 
 function downloadFile (path,name,dateversion){
