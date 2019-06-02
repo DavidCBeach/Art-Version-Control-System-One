@@ -63,6 +63,9 @@ ul{
 #signinsub{
   display:none;
 }
+#signinsubup{
+  display:none;
+}
 .signing{
   text-align: left;
 }

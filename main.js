@@ -1,14 +1,28 @@
 const http = require('http');
 var express = require("express");
-const app = express()
+var session = require('express-session')
+const app = express();
 var url = require('url');
 var fs = require('fs');
 var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
+var crypto = require('crypto');
+var encryptpass = require('./custom_modules/encrypt.mjs');
+algorithm = 'aes-256-ctr';
+password = encryptpass.password();
 var PSD = require('psd');
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
+app.set('trust proxy', 1) // trust first proxy
+
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 60000 }
+}))
+
 
 
 //TODO:
@@ -37,6 +51,47 @@ app.post('/fileupload', (req, res) => {
   });
 });
 
+app.post('/deletefile', (req, res) => {
+  var version = req.body.version;
+  var id = req.body.id;
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+
+      db.get(`select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version) where id = ?`,[id], (err, row) =>{
+          if(row.version == version){
+            version = row.version - 1;
+            db.run(`update projects set version = ? where id = ?`, [version,row.project_id], function(err) {
+              if (err) {
+                return console.log(err.message);
+              }
+              console.log("project version updated");
+              db.run('delete from files where id = ?',[id], function(err){
+            });
+            });
+          } else {
+            db.run('delete from files where id = ?',[id], function(err){
+          });
+        }
+});
+});
+app.post('/deleteproject', (req, res) => {
+  var id = req.body.id;
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+  db.run('delete from projects where id = ?',[id], function(err){
+});
+db.run('delete from files where project_id = ?',[id], function(err){
+});
+
+});
 app.post('/progupload', (req, res) => {
   var form = new formidable.IncomingForm();
   globalReq = req;
@@ -45,24 +100,103 @@ app.post('/progupload', (req, res) => {
     if((files.filetoupload.name && fields.progname)&&(!fields.progname.includes(" "))){
       fileAdd(files,true,fields.progname);
     } else {
-      fileReader("/newProject.html",req,res);
+      fileReader("/library.html",req,res);
     }
   });
 });
+function encrypt(text){
+  var cipher = crypto.createCipher(algorithm,password)
+  var crypted = cipher.update(text,'utf8','hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+function decrypt(text){
+  var decipher = crypto.createDecipher(algorithm,password)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
 app.post('/signin', (req, res) => {
-  console.log("fields.username");
+  console.log("signin");
+  var ssn = req.session;
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
   var form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
-    console.log(fields.username);
-    console.log(fields.password);
+  var password = encrypt(fields.password);
+  var username = fields.username;
+  console.log(password, username)
+  db.get(`select * from accounts where username = ? and password = ? `,[username,password],
+     (err, row) => {
+     if (err) {
+       console.error("vsause error here:",err.message);
+     }
+     if (row) {
+       console.log("signed in");
+       req.session.account = row.id;
+       req.session.save(function(err) {
+          // session saved
+        })
+
+  }
+  });
+
     //TODO: add username to session and verify and push to db username and passwords
     //also add deleting to db
     //this is going to involve reworking the database
-    //switch file system to 
+    //switch file system to
   });
   fileReader("/library.html",req,res);
 });
+app.post('/signup', (req, res) => {
+  console.log("signup");
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+  var form = new formidable.IncomingForm();
+  form.parse(req, function (err, fields, files) {
+  var password = encrypt(fields.password);
+  var username = fields.username;
+  db.get(`select * from accounts where username = ? `,[username],
+     (err, row) => {
+     if (err) {
+       console.error("vsause error here:",err.message);
+     }
+     if (row) {
 
+  } else {
+    db.run('insert into accounts(username,password) values(?,?)',[username,password], function(err) {
+      if (err) {console.error("vsause error here:",err.message);}
+      console.log("user added");
+      db.get(`select * from accounts where username = ? `,[username],
+         (err, row) => {
+         if (err) {
+           console.error("vsause error here:",err.message);
+         }
+         if (!row) {
+
+
+      console.log("signed in");
+      req.session.account = row.id;
+      req.session.save(function(err) {
+         // session saved
+       });
+     }
+     });
+});
+}
+
+  fileReader("/library.html",req,res);
+});
+});
+});
 app.use(express.static('public'));
 
 app.get('/download', function(req, res){
@@ -84,7 +218,6 @@ app.get('/getfiles', (req, res) => {
      }
      res.json({files:row});
   });
-
 });
 
 app.get('/getlatest', (req, res) => {
@@ -94,15 +227,56 @@ app.get('/getlatest', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-    db.all(`select * from projects, files where projects.id = files.project_id and projects.version = files.version`,
+  if(req.session.account){
+    db.all(`select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version) where account_id = ?`,[req.session.account],
      (err, row) => {
      if (err) {
        console.error(err.message);
      }
-     res.json({files:row});
-  });
-});
+     if(row){
+       res.json({files:row});
+     }
 
+  });
+  }
+
+});
+app.get('/verifyaccount', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+
+       db.get(`select * from projects where id = ? and account_id = ?`,[req.query.id,req.session.account],
+          (err, row) => {
+          if (err) {
+            console.error("vsause error here:",err.message);
+          }
+          if (row) {
+
+            res.json({verification: true});
+       } else {
+         res.json({verification: false});
+       }
+
+
+     });
+
+
+
+});
+app.get('/getaccount', (req, res) => {
+  res.json({account:req.session.account});
+
+
+
+});
+app.get('/signout', (req, res) => {
+    req.session.account = -1;
+    res.redirect("library.html");
+});
 app.get('/getinfo', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -110,15 +284,27 @@ app.get('/getinfo', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-    db.all(`select * from files where name = ? order by version desc`,[req.query.file],
+    db.all(`select * from files where project_id = ? order by version desc`,[req.query.file],
      (err, row) => {
      if (err) {
        console.error(err.message);
-     }
-     res.json({info:row});
-  });
-});
+     } if(row){
+       db.get(`select name from projects where id = ? `,[req.query.file],
+          (err, row2) => {
+          if (err) {
+            console.error("vsause error here:",err.message);
+          }
+          if (row2) {
 
+            res.json({info:row,name:row2["name"]});
+       }
+
+
+     });
+
+  }
+});
+});
 
 app.get('/getfolders', (req, res) => {
   fs.readdir("./public/files/", (err, files) => {
@@ -163,10 +349,26 @@ app.get('/sqlprojects', (req, res) => {
      res.json({files: row})
   });
 });
+app.get('/sqlaccounts', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+    db.all(`select * from accounts`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     res.json({accounts: row})
+  });
+});
 
 app.get('/*', (req, res) => {
     var q = url.parse(req.url, true);
     var filename =  q.pathname;
+
     if(filename == "/"){
       filename = "/library.html";
     }
@@ -199,16 +401,16 @@ var fileAdd = function(files,prog = false,progname = ""){
 }
 
 //sets actual location of uploaded file
-var filePather = function(version,name,oldpath,extension){
-  var newpath = './public/files/' + name + '/'+version +'.'+extension;
-  var dir = './public/files/' + name;
+var filePather = function(version,id,oldpath,extension){
+  var newpath = './public/files/' + id + '/'+version +'.'+extension;
+  var dir = './public/files/' + id;
   if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
   }
   fs.rename(oldpath, newpath, function (err) {
     if (err) throw err;
     if(extension == "psd"){
-      fileConverter('./public/files/' + name + '/'+version);
+      fileConverter('./public/files/' + id + '/'+version);
     }
     //TODO: galibrary upload returns to galibrary
     fileReader("/library.html",globalReq,globalRes);
@@ -235,7 +437,8 @@ var filesInsert = function(db,name,extension,version,id ){
 
 //inserts file into NEW project
 var fileInsert = function(db,name,extension,filepath){
-  db.get(`select id,version from projects where name = ? `,[name],
+
+  db.get(`select id,version from projects where name = ? and account_id = ? `,[name, globalReq.session.account],
      (err, row) => {
      if (err) {
        console.error("vsause error here:",err.message);
@@ -245,19 +448,22 @@ var fileInsert = function(db,name,extension,filepath){
        id = row.id;
     console.log(version, id);
     filesInsert(db, name,extension,version,id);
-    filePather(version,name,filepath,extension);
+    filePather(version,id,filepath,extension);
   } else {
-    db.run('insert into projects(name,version) values(?,?)',[name,0], function(err) {
+    db.run('insert into projects(name,version,account_id) values(?,?,?)',[name,0,globalReq.session.account], function(err) {
       if (err) {console.error("vsause error here:",err.message);}
       version = 0;
-      db.get(`select id from projects where name = ? `,[name],
+      db.get(`select id from projects where name = ?  and account_id = ?`,[name, globalReq.session.account],
          (err, row) => {
          if (err) {
            console.error("vsause error here:",err.message);
          }
-         id = row.id;
-         filesInsert(db,name,extension,version,id);
-         filePather(version,name,filepath,extension);
+         if(row){
+           id = row.id;
+           filesInsert(db,name,extension,version,id);
+           filePather(version,id,filepath,extension);
+         }
+
        });
      });
    }
