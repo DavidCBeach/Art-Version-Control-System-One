@@ -24,8 +24,8 @@
               <ul class="uk-navbar-nav">
                   <li ><a href="library.html">LIBRARY</a></li>
                   <li class="uk-active">
-                  <a id="projectname"class="pagename" href="#"></a>
-                <div class="uk-navbar-dropdown">
+                  <a id="pagename" href="#"></a>
+                <div id= "viewoptions"class="uk-navbar-dropdown">
                     <ul class="uk-nav uk-navbar-dropdown-nav">
                         <li id="viewMode" class="uk-active"><a onclick="setViewMode()" href="#">View Mode</a></li>
                         <li id="editMode" ><a onclick="setEditMode()" href="#">Edit Mode</a></li>
@@ -43,7 +43,7 @@
                     </form>
                 </li>
                 <li id="signin"><a uk-toggle="target: #sign" type="button" href="#">Sign in</a></li>
-                <li id="signout"><a href="#">Sign out</a></li>
+                <li id="signout"><a onclick="signout()" href="#">Sign out</a></li>
               </ul>
 
           </div>
@@ -56,20 +56,31 @@
             </ul>
 
             <ul class="uk-switcher uk-margin">
-                <li>
-                  <form name="signingform" action="signin" id= "progUpload" method="post" enctype="multipart/form-data">
-                    <span>Username: </span><input type="text" name="progname">
-                    <span>Password: </span><input type="text" name="progname">
+                <li class="signing">
+                  <form name="signingform" action="signin" id= "signingform" method="post" enctype="multipart/form-data">
+                    <span>Username: </span><input type="text" name="username">
+                    <br><br>
+                    <span>Password: </span><input type="password" name="password">
 
                       <input   class='uk-button uk-button-primary' id="signinsub"type="submit" value ="Submit">
                   </form>
                   <button class="uk-modal-close uk-button uk-button-primary" onclick="clickSubmit()"type="button">Submit</button>
                 </li>
-                <li>Hello again!</li>
+                <li class="signing">
+                  <form name="signupform" action="signup" id= "signupform" method="post" enctype="multipart/form-data">
+                    <span>Username: </span><input type="text" name="username">
+                    <br><br>
+                    <span>Password: </span><input type="password" name="password">
+
+                      <input   class='uk-button uk-button-primary' id="signinsubup"type="submit" value ="Submit">
+                  </form>
+                  <button class="uk-modal-close uk-button uk-button-primary" onclick="clickSubmitup()"type="button">Submit</button>
+                </li>
+
             </ul>
 
           </div>
-      </div>
+          </div>
       <div id="addContainer">
         <button class="uk-button uk-button-primary uk-margin-small-right" onclick="uploaderActivate()" type="button" >Upload File</button>
         <div id="deleteProjectButton" class="uk-inline">
@@ -95,6 +106,7 @@
 <script>
 
 function setEditMode(){
+
   var editMode = document.getElementById("editMode");
   editMode.className = "uk-active";
   var viewMode = document.getElementById("viewMode");
@@ -130,11 +142,12 @@ function clickSubmit(){
 console.log("running");
 const urlParams = new URLSearchParams(window.location.search);
 const folder = urlParams.get("file");
-document.getElementById("filer").action = "fileupload?name="+folder;
-$("#projectname").append(folder);
+
 //populating version list
 $.get("/getinfo?file="+folder).done(function(data){
   info = data["info"];
+  $("#pagename").append(data["name"]);
+  document.getElementById("filer").action = "fileupload?name="+data["name"];
   for(i = 0; i < info.length; i++){
     var extension = info[i]["extension"];
     if(extension == "psd"){
@@ -151,12 +164,70 @@ $.get("/getinfo?file="+folder).done(function(data){
     $("#versions").append(list1+list2+list3+list4+list5);
   }
 });
+
 $.get("/getaccount").done(function(data){
-  if(data){
+  if(data.account != -1 && data.account){
     console.log(data);
+    var siginbutton = document.getElementById("signin");
+    siginbutton.style.cssText = "display: none;"
+    var sigoutbutton = document.getElementById("signout");
+    sigoutbutton.style.cssText = "display: inline;"
+    var addContainer = document.getElementById("addContainer");
+    addContainer.style.cssText = "display: inline;"
+  } else {
+    var siginbutton = document.getElementById("signin");
+    siginbutton.style.cssText = "display: inline;"
+    var sigoutbutton = document.getElementById("signout");
+    sigoutbutton.style.cssText = "display: none;"
+    var addContainer = document.getElementById("addContainer");
+    addContainer.style.cssText = "display: none;"
   }
 });
+$.get("/verifyaccount?id="+folder).done(function(data){
+  console.log(data);
+  if(!data["verification"]){
+    var viewoptions = document.getElementById("editMode");
+    viewoptions.style.cssText = "display: none !important;"
+    var addcon = document.getElementById("addContainer");
+    addcon.style.cssText = "display: none;"
+  } else {
+    var viewoptions = document.getElementById("editMode");
+    viewoptions.style.cssText = "display: inline;"
+    var addcon = document.getElementById("addContainer");
+    addcon.style.cssText = "display: inline;"
+  }
+});
+function signout(){
+  $.get("/signout").done(function(data){
 
+  });
+}
+function clickSubmit(){
+  var uprfile = document.getElementById("signinsub");
+  uprfile.click();
+}
+function clickSubmitup(){
+  var upgfile = document.getElementById("signinsubup");
+  upgfile.click();
+}
+function deleteFile(version, id){
+  const data = {
+    version: version, id: id
+  }
+  $.post("/deletefile",data,function(data, status){
+    console.log("file deleted");
+  });
+}
+function deleteProject(){
+  const id = urlParams.get("file");
+  console.log("deleting ",id);
+  const data = {
+     id: id
+  }
+  $.post("/deleteproject",data, function(data, status){
+    console.log("project deleted");
+  });
+}
 function downloadFile (path,name,dateversion){
   console.log("download intiated",info[0]["extension"]);
   window.open("/download?file="+path+"&name="+name+"&dateversion="+dateversion);

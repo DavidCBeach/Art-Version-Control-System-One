@@ -108,7 +108,7 @@ $.get('/getlatest').done(function(data){
       if(extension == "psd"){
         extension = "png";
       }
-      path = info[i]["[project_id"]+"/"+info[i]["version"]+".";
+      path = info[i]["project_id"]+"/"+info[i]["version"]+".";
       var appendic = "<tr><th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'></a></th>";
       var  appendic2 = "</tr>";
       var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><span>"+info[i]["name"]+"</span></a></th>";
@@ -126,11 +126,15 @@ $.get('/getlatest').done(function(data){
       siginbutton.style.cssText = "display: none;"
       var sigoutbutton = document.getElementById("signout");
       sigoutbutton.style.cssText = "display: inline;"
+      var addContainer = document.getElementById("addContainer");
+      addContainer.style.cssText = "display: inline;"
     } else {
       var siginbutton = document.getElementById("signin");
       siginbutton.style.cssText = "display: inline;"
       var sigoutbutton = document.getElementById("signout");
       sigoutbutton.style.cssText = "display: none;"
+      var addContainer = document.getElementById("addContainer");
+      addContainer.style.cssText = "display: none;"
     }
   });
 
