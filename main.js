@@ -24,13 +24,18 @@ app.use(session({
 }))
 
 
-
-//TODO:
-//difference showwer
-//multiple account support
+//likes TODO: for file compare read in all pixel info and compare between versions
+//if there is difference color with highlight effect
+//then show modified image to show changes in files
 //Multiple files with same version number for project with multiple files
-//delete project/versions
 //allow project names to contain spaces
+//card view mode for library and galibrary
+
+//req TODO
+//search function
+//public library
+//public profile
+
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -38,9 +43,6 @@ const port = 3000;
 let globalReq;
 let globalRes;
 
-//TODO: for file compare read in all pixel info and compare between versions
-//if there is difference color with highlight effect
-//then show modified image to show changes in files
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm();
@@ -145,10 +147,6 @@ app.post('/signin', (req, res) => {
   }
   });
 
-    //TODO: add username to session and verify and push to db username and passwords
-    //also add deleting to db
-    //this is going to involve reworking the database
-    //switch file system to
   });
   fileReader("/library.html",req,res);
 });
