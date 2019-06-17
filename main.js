@@ -8,6 +8,7 @@ var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 var crypto = require('crypto');
+const browser = require('browser-detect');
 var encryptpass = require('./custom_modules/encrypt.mjs');
 algorithm = 'aes-256-ctr';
 password = encryptpass.password();
@@ -35,6 +36,7 @@ app.use(session({
 //search function
 //public library
 //public profile
+//handle names with '-'  for file upload from galibrary
 
 
 const hostname = '127.0.0.1';
@@ -63,8 +65,10 @@ app.post('/deletefile', (req, res) => {
     console.log('Connected to the in-memory SQlite database.');
   });
 
-      db.get(`select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version) where id = ?`,[id], (err, row) =>{
-          if(row.version == version){
+      db.get(`select * from (select * from ( select id as projects_id, name, version as project_version, account_id from projects), files where projects_id = files.project_id) where id = ?`,[id], (err, row) =>{
+          console.log(row);
+          console.log("version: " + version);
+          if(row.project_version == version){
             version = row.version - 1;
             db.run(`update projects set version = ? where id = ?`, [version,row.project_id], function(err) {
               if (err) {
@@ -79,6 +83,16 @@ app.post('/deletefile', (req, res) => {
           });
         }
 });
+// console.log(id);
+// console.log(version);
+// db.all(`select id, name, version as project_version, account_id from projects`, (err, row) =>{
+//         console.log(row);
+//
+//          });
+// db.all(`select * from (select * from ( select id as projects_id, name, version as project_version, account_id from projects), files where projects_id = files.project_id) where id = ?`,[id], (err, row) =>{
+//         console.log(row);
+//
+//          });
 });
 app.post('/deleteproject', (req, res) => {
   var id = req.body.id;
@@ -469,23 +483,47 @@ var fileInsert = function(db,name,extension,filepath){
 }
 
 var fileReader = function(filename,req,res){
-    filename = "./templates" + filename;
-    fs.readFile(filename, function(err, data) {
-    //simple log and console output
-    if (err) {
-      res.writeHead(404, {'Content-Type': 'text/html'});
-      console.log("[404] "+ req.url);
+  const result = browser(req.headers['user-agent']);
+  console.log(result);
+  if(result.name == "chrome" && filename.indexOf("galibrary") >= 0){
+    console.log(result);
+      filename = "./templates/chrome" + filename;
+      fs.readFile(filename, function(err, data) {
+      //simple log and console output
+      if (err) {
+        res.writeHead(404, {'Content-Type': 'text/html'});
+        console.log("[404] "+ req.url);
+        //disable log by commenting out line below
+        fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+        return res.end("404 Not Found");
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      console.log("[200] "+req.url);
       //disable log by commenting out line below
-      fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
-      return res.end("404 Not Found");
-    }
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    console.log("[200] "+req.url);
-    //disable log by commenting out line below
-    fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
-    return res.end();
-    });
+      fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+      return res.end();
+      });
+  } else {
+      filename = "./templates" + filename;
+      fs.readFile(filename, function(err, data) {
+      //simple log and console output
+      if (err) {
+        res.writeHead(404, {'Content-Type': 'text/html'});
+        console.log("[404] "+ req.url);
+        //disable log by commenting out line below
+        fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+        return res.end("404 Not Found");
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      console.log("[200] "+req.url);
+      //disable log by commenting out line below
+      fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+      return res.end();
+      });
+  }
+
 
   }
 //photoshop file converter
