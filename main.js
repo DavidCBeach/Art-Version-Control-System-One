@@ -31,11 +31,10 @@ app.use(session({
 //Multiple files with same version number for project with multiple files
 //allow project names to contain spaces
 //card view mode for library and galibrary
+//public profile
 
 //req TODO
 //search function
-//public library
-//public profile
 //handle names with '-'  for file upload from galibrary
 
 
@@ -262,19 +261,22 @@ app.get('/getlatestpublic', (req, res) => {
     console.log('Connected to the in-memory SQlite database.');
   });
 
-    db.all(`select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version) where public = 1`,
-     (err, row) => {
+    db.all(`select * from (select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version), accounts where accounts.id = account_id) where public = 1`,
+     (err, rows) => {
      if (err) {
        console.error(err.message);
      }
-     if(row){
-       res.json({files:row});
+     if(rows){
+       res.json({files:rows});
      }
 
   });
-  
+
 
 });
+
+
+
 app.get('/verifyaccount', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {

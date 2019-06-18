@@ -38,8 +38,8 @@
 
             <ul class="uk-navbar-nav">
               <li id="search">
-                  <form  class="uk-search uk-search-default">
-                      <input class="uk-search-input" type="search" placeholder="Search...">
+                  <form  class="uk-search uk-search-default" >
+                      <input class="uk-search-input" id="searchInput" type="search" placeholder="Search..." onkeyup="searchFunction()">
                   </form>
               </li>
               <li id="signin"><a uk-toggle="target: #sign" type="button" href="#">Sign in</a></li>
@@ -167,14 +167,30 @@ function setPublic(){
         var  appendic2 = "</tr>";
         var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><span>"+info[i]["name"]+"</span></a></th>";
         var progname = info[i]["name"];
-        var button = "<th class = 'uploadrow'><div class= 'uploadSpace'><button onclick='uploaderActivate("+info[i]["project_id"]+")'class='uk-button uk-button-default'>Upload File</button>";
-        var button2 = "</div></th>";
-        var form2 = "<form id ='"+progname+"' class='uploadForm'  action='fileupload?name="+progname+"&project_id="+info[i]["project_id"]+"' method='post' enctype='multipart/form-data'>	<input type='file'  id='"+info[i]["project_id"]+"' class = 'fileup'name='filetoupload' onchange='submit("+progname+")'><br></form>";
-        $("table").append(appendic+ name+button+form2 + button2+ appendic2);
+        var account = "<th><span>"+info[i]["username"]+"</span></th>";
+        $("table").append(appendic+ name+account+ appendic2);
       }
     });
 }
-
+function searchFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("tab");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    th = tr[i].getElementsByTagName("th")[1].lastChild.lastChild;
+    console.log(th);
+    if (th) {
+      txtValue = th.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
 
   $.get("/getaccount").done(function(data){
     if(data.account != -1 && data.account){
@@ -214,6 +230,9 @@ function setPublic(){
   function signout(){
     $.get("/signout").done(function(data){
       setPublic();
+      var addcon = document.getElementById("addContainer");
+      addcon.style.cssText = "display: none;";
+
     });
   }
   function clickSubmit(){
