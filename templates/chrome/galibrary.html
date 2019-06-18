@@ -17,6 +17,8 @@
     <div id = "titles">
       <span class = "title"> A.V.C.S. </span>
       <span class = "subtitle">Art Version Control System</span>
+      <span class = "chrome" style="visibility:hidden"> Chrome </span>
+
       <br>
 
       <nav class="uk-navbar-container" uk-navbar>
@@ -37,11 +39,11 @@
           <div class="uk-navbar-right">
 
               <ul class="uk-navbar-nav">
-                <!-- <li id="search">
+                <li id="search">
                     <form  class="uk-search uk-search-default">
                         <input class="uk-search-input" type="search" placeholder="Search...">
                     </form>
-                </li> -->
+                </li>
                 <li id="signin"><a uk-toggle="target: #sign" type="button" href="#">Sign in</a></li>
                 <li id="signout"><a onclick="signout()" href="#">Sign out</a></li>
               </ul>
@@ -83,14 +85,18 @@
           </div>
       <div id="addContainer">
         <button class="uk-button uk-button-primary uk-margin-small-right" onclick="uploaderActivate()" type="button" >Upload File</button>
-        <div id="deleteProjectButton" class="uk-inline">
-            <button class="uk-button uk-button-danger uk-margin-small-right" type="button" >Delete Project</button>
-            <div uk-dropdown="mode: click">
+
+            <button id="deleteProjectButton" class="uk-button uk-button-danger uk-margin-small-right" uk-toggle="target: #modal-delete-project" type="button" >Delete Project</button>
+      </div>
+
+      <div id="modal-delete-project" uk-modal>
+          <div class="uk-modal-dialog uk-modal-body">
+              <button class="uk-modal-close-default" type="button" uk-close></button>
+              <h2 class="uk-modal-title">Delete Project</h2>
               <p> WARNING: This will delete your project perminately from your library.</p>
                   <button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteProject()" type="button" >Confirm Delete Project</button>
 
-            </div>
-        </div>
+          </div>
       </div>
       <div class= "uploadSpace3">
         <form id ="filer" class="uploadForm"  action="/" method="post" enctype="multipart/form-data">
@@ -103,6 +109,11 @@
     <ul  id="versions" class= "uk-list uk-list-striped versions"></ul>
   </div>
 </body>
+
+
+
+
+
 <script>
   function signout(){
     $.get("/signout").done(function(data){
@@ -111,6 +122,14 @@
 
     });
   }
+$('.subtitle').mouseover(function() {
+  $('.chrome').css("visibility","visible");
+});
+
+$('.subtitle').mouseout(function() {
+  $('.chrome').css("visibility","hidden");
+});
+
 function setEditMode(){
 
   var editMode = document.getElementById("editMode");
@@ -166,7 +185,7 @@ $.get("/getinfo?file="+folder).done(function(data){
     var list3 = "<span class='infotitle'>Date Uploaded: </span><span>"+date+"</span><br><br>";
     var nsdate = date.toString().split(" ").join("");
     var list4 = "<button class='uk-button uk-button-default' onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button>"
-    var list5 ='<div class="deleteButton uk-inline"><button class="uk-button uk-button-danger uk-margin-small-right" type="button" >Delete</button><div uk-dropdown="mode: click"><p> WARNING: This will delete this version perminately from your project.</p><button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteFile('+info[i]["version"]+','+info[i]["id"]+')" type="button" >Delete</button></div></div></li>';
+    var list5 =  '<button class="uk-button uk-button-danger uk-margin-small-right deleteButton" type="button" uk-toggle="target: #modal-delete-version" >Delete</button><div id="modal-delete-version" uk-modal><div class="uk-modal-dialog uk-modal-body"><button class="uk-modal-close-default" type="button" uk-close></button><h2 class="uk-modal-title">Delete Verson</h2><p> WARNING: This will delete this version perminately from your project.</p>  <button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteFile('+info[i]["version"]+','+info[i]["id"]+')" type="button" >Delete</button></div></div>';
     $("#versions").append(list1+list2+list3+list4+list5);
   }
 });
@@ -218,7 +237,6 @@ function deleteFile(version, id){
   }
   $.post("/deletefile",data,function(data, status){
     console.log("file deleted");
-    window.location.href = "library.html";
   });
 }
 function deleteProject(){

@@ -1,0 +1,76 @@
+
+
+.title{
+  padding-left: 8px;
+}
+.chrome{
+  visibility: hidden;
+}
+#back{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  left: 0;
+}
+.preview{
+  height: 50px;
+  width:auto;
+  margin-left: 8px;
+}
+#addContainer{
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
+th{
+    text-align: center !important;
+    vertical-align:middle !important;
+}
+#submit{
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+}
+/*uploadfilebutton ~~ here be dragons*/
+.uploadFormproject{
+  display: none;
+}
+.uploadForm{
+  display: none;
+}
+#progUploadCon{
+ margin-bottom: 60px;
+
+}
+img{
+  width:400px;
+  height:auto;
+}
+ul{
+  list-style: none;
+  text-align: center;
+}
+#search{
+    vertical-align:middle !important;
+    padding-top:20px;
+}
+#deleteProjectButton{
+  display: none;
+}
+.deleteButton{
+  margin-left: 20px !important;
+  display:none !important;
+}
+#signout{
+  display:none;
+}
+#signinsub{
+  display:none;
+}
+#signinsubup{
+  display:none;
+}
+.signing{
+  text-align: left;
+}

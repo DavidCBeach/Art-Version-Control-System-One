@@ -22,8 +22,15 @@
         <div class="uk-navbar-left">
 
             <ul class="uk-navbar-nav">
-                <li class="uk-active"><a href="library.html">LIBRARY</a></li>
-                <li></li>
+                <li class="uk-active">
+                <a id="pagename" href="library.html">LIBRARY</a>
+              <div id= "viewoptions"class="uk-navbar-dropdown">
+                  <ul class="uk-nav uk-navbar-dropdown-nav">
+                      <li id="privateMode" class="uk-active"><a onclick="setPrivateMode()" href="#">My Library</a></li>
+                      <li id="publicMode" ><a onclick="setPublicMode()" href="#">Public Library</a></li>
+                  </ul>
+              </div>
+              </li>
             </ul>
 
         </div>
@@ -31,8 +38,8 @@
 
             <ul class="uk-navbar-nav">
               <li id="search">
-                  <form  class="uk-search uk-search-default">
-                      <input class="uk-search-input" type="search" placeholder="Search...">
+                  <form  class="uk-search uk-search-default" >
+                      <input class="uk-search-input" id="searchInput" type="search" placeholder="Search..." onkeyup="searchFunction()">
                   </form>
               </li>
               <li id="signin"><a uk-toggle="target: #sign" type="button" href="#">Sign in</a></li>
@@ -77,7 +84,7 @@
     <div id="addContainer">
       <button class="uk-button uk-button-secondary uk-margin-small-right" type="button" uk-toggle="target: #modal-example">Add Project</button>
     </div>
-  <table class="uk-table uk-table-responsive uk-table-divider"></table>
+  <table id="tab" class="uk-table uk-table-responsive uk-table-divider"></table>
   <div id="modal-example" uk-modal>
     <div class="uk-modal-dialog uk-modal-body">
       <h3>Add New Project</h3>
@@ -86,9 +93,13 @@
           <span>Project Name: </span><input type="text" name="progname"> <br> <span id='prognameguide'>Project name must contain no spaces.</span><br>
 
             <input id = "uploader" class="uploadFormproject" type="file" name="filetoupload">
+
           <div id="submit">
             <input   class='uk-button uk-button-primary' id="submitter"type="submit" value ="Submit">
           </div>
+          <span>Choose to have your project displayed on the public library: </span> <br>
+          <input type="radio" name="public" value="yes" checked> Public
+          <input type="radio" name="public" value="no"> Private
         </form>
         <span>Project File: </span>
           <button onclick='uploaderActivatePro()' class='uk-button uk-button-default'>Upload File</button>
@@ -99,47 +110,129 @@
 </div>
 </body>
 <script>
+  function setPublicMode(){
+    var privateMode = document.getElementById("privateMode");
+    privateMode.className = "";
+    var publicMode = document.getElementById("publicMode");
+    publicMode.className = "uk-active";
+    setPublic();
+  }
+  function setPrivateMode(){
+    var publicMode = document.getElementById("publicMode");
+    publicMode.className = "";
+    var privateMode = document.getElementById("privateMode");
+    privateMode.className = "uk-active";
+    setPrivate();
+  }
 //Populates library table
-$.get('/getlatest').done(function(data){
-    console.log(data);
-    var info = data["files"].reverse();
-    for(i = 0; i < info.length;i++){
-      var extension = info[i]["extension"];
-      if(extension == "psd"){
-        extension = "png";
+function setPrivate(){
+  $.get('/getlatest').done(function(data){
+      console.log(data);
+      var table = document.getElementById("tab");
+      table.innerHTML = "";
+      var info = data["files"].reverse();
+      for(i = 0; i < info.length;i++){
+        var extension = info[i]["extension"];
+        if(extension == "psd"){
+          extension = "png";
+        }
+
+        path = info[i]["project_id"]+"/"+info[i]["version"]+".";
+        var appendic = "<tr><th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'></a></th>";
+        var  appendic2 = "</tr>";
+        var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><span>"+info[i]["name"]+"</span></a></th>";
+        var progname = info[i]["name"];
+        var button = "<th class = 'uploadrow'><div class= 'uploadSpace'><button onclick='uploaderActivate("+info[i]["project_id"]+")'class='uk-button uk-button-default'>Upload File</button>";
+        var button2 = "</div></th>";
+        var form2 = "<form id ='"+progname+"' class='uploadForm'  action='fileupload?name="+progname+"&project_id="+info[i]["project_id"]+"' method='post' enctype='multipart/form-data'>	<input type='file'  id='"+info[i]["project_id"]+"' class = 'fileup'name='filetoupload' onchange='submit("+progname+")'><br></form>";
+        $("table").append(appendic+ name+button+form2 + button2+ appendic2);
       }
-      path = info[i]["project_id"]+"/"+info[i]["version"]+".";
-      var appendic = "<tr><th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'></a></th>";
-      var  appendic2 = "</tr>";
-      var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><span>"+info[i]["name"]+"</span></a></th>";
-      var progname = info[i]["name"];
-      var button = "<th class = 'uploadrow'><div class= 'uploadSpace'><button onclick='uploaderActivate("+info[i]["project_id"]+")'class='uk-button uk-button-default'>Upload File</button>";
-      var button2 = "</div></th>";
-      var form2 = "<form id ='"+progname+"' class='uploadForm'  action='fileupload?name="+progname+"&project_id="+info[i]["project_id"]+"' method='post' enctype='multipart/form-data'>	<input type='file'  id='"+info[i]["project_id"]+"' class = 'fileup'name='filetoupload' onchange='submit("+progname+")'><br></form>";
-      $("table").append(appendic+ name+button+form2 + button2+ appendic2);
+    });
+}
+function setPublic(){
+
+  $.get('/getlatestpublic').done(function(data){
+      console.log(data);
+      var table = document.getElementById("tab");
+      table.innerHTML = "";
+      var info = data["files"].reverse();
+      console.log(":");
+      for(i = 0; i < info.length;i++){
+        var extension = info[i]["extension"];
+        if(extension == "psd"){
+          extension = "png";
+        }
+        path = info[i]["project_id"]+"/"+info[i]["version"]+".";
+        var appendic = "<tr><th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><img class = 'preview' src='/files/"+path+extension+"' height='300' width='auto'></a></th>";
+        var  appendic2 = "</tr>";
+        var name = "<th><a class = 'progclick' href = 'galibrary.html?file="+info[i]["project_id"]+"'><span>"+info[i]["name"]+"</span></a></th>";
+        var progname = info[i]["name"];
+        var account = "<th><span>"+info[i]["username"]+"</span></th>";
+        $("table").append(appendic+ name+account+ appendic2);
+      }
+    });
+}
+function searchFunction() {
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("tab");
+  tr = table.getElementsByTagName("tr");
+  for (i = 0; i < tr.length; i++) {
+    th = tr[i].getElementsByTagName("th")[1].lastChild.lastChild;
+    console.log(th);
+    if (th) {
+      txtValue = th.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
     }
-  });
+  }
+}
+
   $.get("/getaccount").done(function(data){
     if(data.account != -1 && data.account){
       console.log(data);
+      setPrivate();
       var siginbutton = document.getElementById("signin");
       siginbutton.style.cssText = "display: none;"
       var sigoutbutton = document.getElementById("signout");
       sigoutbutton.style.cssText = "display: inline;"
-      var addContainer = document.getElementById("addContainer");
-      addContainer.style.cssText = "display: inline;"
+      var viewoptions = document.getElementById("privateMode");
+      viewoptions.style.cssText = "display: inline;"
+      var addcon = document.getElementById("addContainer");
+      addcon.style.cssText = "display: inline;";
+      var privateMode = document.getElementById("privateMode");
+      privateMode.className = "uk-active";
+      var publicMode = document.getElementById("publicMode");
+      publicMode.className = "";
     } else {
+
+      setPublic();
       var siginbutton = document.getElementById("signin");
       siginbutton.style.cssText = "display: inline;"
       var sigoutbutton = document.getElementById("signout");
       sigoutbutton.style.cssText = "display: none;"
-      var addContainer = document.getElementById("addContainer");
-      addContainer.style.cssText = "display: none;"
+      var viewoptions = document.getElementById("privateMode");
+      viewoptions.style.cssText =  "display: none !important;";
+      var addcon = document.getElementById("addContainer");
+      addcon.style.cssText = "display: none;";
+      var publicMode = document.getElementById("publicMode");
+      publicMode.className = "uk-active";
+      var privateMode = document.getElementById("privateMode");
+      privateMode.className = "";
     }
+
   });
 
   function signout(){
     $.get("/signout").done(function(data){
+      setPublic();
+      var addcon = document.getElementById("addContainer");
+      addcon.style.cssText = "display: none;";
+      window.location.href = "library.html";
 
     });
   }

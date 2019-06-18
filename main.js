@@ -8,6 +8,7 @@ var dt = require("./custom_modules/dategetter")
 var formidable = require('formidable');
 const sqlite3 = require("sqlite3").verbose();
 var crypto = require('crypto');
+const browser = require('browser-detect');
 var encryptpass = require('./custom_modules/encrypt.mjs');
 algorithm = 'aes-256-ctr';
 password = encryptpass.password();
@@ -24,13 +25,18 @@ app.use(session({
 }))
 
 
-
-//TODO:
-//difference showwer
-//multiple account support
+//likes TODO: for file compare read in all pixel info and compare between versions
+//if there is difference color with highlight effect
+//then show modified image to show changes in files
 //Multiple files with same version number for project with multiple files
-//delete project/versions
 //allow project names to contain spaces
+//card view mode for library and galibrary
+//public profile
+
+//req TODO
+//search function
+//handle names with '-'  for file upload from galibrary
+
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -38,9 +44,6 @@ const port = 3000;
 let globalReq;
 let globalRes;
 
-//TODO: for file compare read in all pixel info and compare between versions
-//if there is difference color with highlight effect
-//then show modified image to show changes in files
 
 app.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm();
@@ -61,8 +64,10 @@ app.post('/deletefile', (req, res) => {
     console.log('Connected to the in-memory SQlite database.');
   });
 
-      db.get(`select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version) where id = ?`,[id], (err, row) =>{
-          if(row.version == version){
+      db.get(`select * from (select * from ( select id as projects_id, name, version as project_version, account_id from projects), files where projects_id = files.project_id) where id = ?`,[id], (err, row) =>{
+          console.log(row);
+          console.log("version: " + version);
+          if(row.project_version == version){
             version = row.version - 1;
             db.run(`update projects set version = ? where id = ?`, [version,row.project_id], function(err) {
               if (err) {
@@ -70,13 +75,25 @@ app.post('/deletefile', (req, res) => {
               }
               console.log("project version updated");
               db.run('delete from files where id = ?',[id], function(err){
+                res.redirect(req.get('referer'));
             });
             });
           } else {
             db.run('delete from files where id = ?',[id], function(err){
+              res.redirect(req.get('referer'));
           });
         }
 });
+// console.log(id);
+// console.log(version);
+// db.all(`select id, name, version as project_version, account_id from projects`, (err, row) =>{
+//         console.log(row);
+//
+//          });
+// db.all(`select * from (select * from ( select id as projects_id, name, version as project_version, account_id from projects), files where projects_id = files.project_id) where id = ?`,[id], (err, row) =>{
+//         console.log(row);
+//
+//          });
 });
 app.post('/deleteproject', (req, res) => {
   var id = req.body.id;
@@ -98,7 +115,8 @@ app.post('/progupload', (req, res) => {
   globalRes = res;
   form.parse(req, function (err, fields, files) {
     if((files.filetoupload.name && fields.progname)&&(!fields.progname.includes(" "))){
-      fileAdd(files,true,fields.progname);
+      console.log(fields);
+      fileAdd(files,true,fields.progname,fields.public);
     } else {
       fileReader("/library.html",req,res);
     }
@@ -145,10 +163,6 @@ app.post('/signin', (req, res) => {
   }
   });
 
-    //TODO: add username to session and verify and push to db username and passwords
-    //also add deleting to db
-    //this is going to involve reworking the database
-    //switch file system to
   });
   fileReader("/library.html",req,res);
 });
@@ -241,6 +255,30 @@ app.get('/getlatest', (req, res) => {
   }
 
 });
+app.get('/getlatestpublic', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+
+    db.all(`select * from (select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version), accounts where accounts.id = account_id) where public = 1`,
+     (err, rows) => {
+     if (err) {
+       console.error(err.message);
+     }
+     if(rows){
+       res.json({files:rows});
+     }
+
+  });
+
+
+});
+
+
+
 app.get('/verifyaccount', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -379,7 +417,7 @@ app.listen(port, () => console.log(`App listening on port ${port}!`));
 
 
 //opens db and extracts nessessary data for file upload
-var fileAdd = function(files,prog = false,progname = ""){
+var fileAdd = function(files,prog = false,progname = "",public = "true"){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -397,7 +435,7 @@ var fileAdd = function(files,prog = false,progname = ""){
   } else {
     name = progname;
   }
-  fileInsert(db,name,extension,filepath);
+  fileInsert(db,name,extension,filepath,public);
 }
 
 //sets actual location of uploaded file
@@ -436,7 +474,7 @@ var filesInsert = function(db,name,extension,version,id ){
 }
 
 //inserts file into NEW project
-var fileInsert = function(db,name,extension,filepath){
+var fileInsert = function(db,name,extension,filepath,public){
 
   db.get(`select id,version from projects where name = ? and account_id = ? `,[name, globalReq.session.account],
      (err, row) => {
@@ -450,7 +488,13 @@ var fileInsert = function(db,name,extension,filepath){
     filesInsert(db, name,extension,version,id);
     filePather(version,id,filepath,extension);
   } else {
-    db.run('insert into projects(name,version,account_id) values(?,?,?)',[name,0,globalReq.session.account], function(err) {
+    console.log(public);
+    if(public == "yes"){
+      p = 1;
+    } else {
+      p = 0;
+    }
+    db.run('insert into projects(name,version,account_id,public) values(?,?,?,?)',[name,0,globalReq.session.account,p], function(err) {
       if (err) {console.error("vsause error here:",err.message);}
       version = 0;
       db.get(`select id from projects where name = ?  and account_id = ?`,[name, globalReq.session.account],
@@ -471,23 +515,47 @@ var fileInsert = function(db,name,extension,filepath){
 }
 
 var fileReader = function(filename,req,res){
-    filename = "./templates" + filename;
-    fs.readFile(filename, function(err, data) {
-    //simple log and console output
-    if (err) {
-      res.writeHead(404, {'Content-Type': 'text/html'});
-      console.log("[404] "+ req.url);
+  const result = browser(req.headers['user-agent']);
+  //console.log(result);
+  if(result.name == "chrome" && filename.indexOf("galibrary") >= 0){
+    //console.log(result);
+      filename = "./templates/chrome" + filename;
+      fs.readFile(filename, function(err, data) {
+      //simple log and console output
+      if (err) {
+        res.writeHead(404, {'Content-Type': 'text/html'});
+        console.log("[404] "+ req.url);
+        //disable log by commenting out line below
+        fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+        return res.end("404 Not Found");
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      console.log("[200] "+req.url);
       //disable log by commenting out line below
-      fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
-      return res.end("404 Not Found");
-    }
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write(data);
-    console.log("[200] "+req.url);
-    //disable log by commenting out line below
-    fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
-    return res.end();
-    });
+      fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+      return res.end();
+      });
+  } else {
+      filename = "./templates" + filename;
+      fs.readFile(filename, function(err, data) {
+      //simple log and console output
+      if (err) {
+        res.writeHead(404, {'Content-Type': 'text/html'});
+        console.log("[404] "+ req.url);
+        //disable log by commenting out line below
+        fs.appendFile('log', "[404] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+        return res.end("404 Not Found");
+      }
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(data);
+      console.log("[200] "+req.url);
+      //disable log by commenting out line below
+      fs.appendFile('log', "[200] "+dt.myDateTime()+" "+req.url+"\n", function (err) {if (err) throw err;});
+      return res.end();
+      });
+  }
+
 
   }
 //photoshop file converter
