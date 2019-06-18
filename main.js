@@ -75,10 +75,12 @@ app.post('/deletefile', (req, res) => {
               }
               console.log("project version updated");
               db.run('delete from files where id = ?',[id], function(err){
+                res.redirect(req.get('referer'));
             });
             });
           } else {
             db.run('delete from files where id = ?',[id], function(err){
+              res.redirect(req.get('referer'));
           });
         }
 });

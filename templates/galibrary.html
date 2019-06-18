@@ -104,7 +104,13 @@
   </div>
 </body>
 <script>
+  function signout(){
+    $.get("/signout").done(function(data){
 
+      window.location.href = "library.html";
+
+    });
+  }
 function setEditMode(){
 
   var editMode = document.getElementById("editMode");
@@ -197,11 +203,7 @@ $.get("/verifyaccount?id="+folder).done(function(data){
     addcon.style.cssText = "display: inline;"
   }
 });
-function signout(){
-  $.get("/signout").done(function(data){
 
-  });
-}
 function clickSubmit(){
   var uprfile = document.getElementById("signinsub");
   uprfile.click();
@@ -216,6 +218,7 @@ function deleteFile(version, id){
   }
   $.post("/deletefile",data,function(data, status){
     console.log("file deleted");
+    window.location.href = "library.html";
   });
 }
 function deleteProject(){

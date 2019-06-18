@@ -115,6 +115,13 @@
 
 
 <script>
+  function signout(){
+    $.get("/signout").done(function(data){
+
+      window.location.href = "library.html";
+
+    });
+  }
 $('.subtitle').mouseover(function() {
   $('.chrome').css("visibility","visible");
 });
@@ -215,11 +222,7 @@ $.get("/verifyaccount?id="+folder).done(function(data){
     addcon.style.cssText = "display: inline;"
   }
 });
-function signout(){
-  $.get("/signout").done(function(data){
 
-  });
-}
 function clickSubmit(){
   var uprfile = document.getElementById("signinsub");
   uprfile.click();
