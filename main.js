@@ -114,7 +114,8 @@ app.post('/progupload', (req, res) => {
   globalRes = res;
   form.parse(req, function (err, fields, files) {
     if((files.filetoupload.name && fields.progname)&&(!fields.progname.includes(" "))){
-      fileAdd(files,true,fields.progname);
+      console.log(fields);
+      fileAdd(files,true,fields.progname,fields.public);
     } else {
       fileReader("/library.html",req,res);
     }
@@ -251,6 +252,27 @@ app.get('/getlatest', (req, res) => {
 
   });
   }
+
+});
+app.get('/getlatestpublic', (req, res) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+  });
+
+    db.all(`select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version) where public = 1`,
+     (err, row) => {
+     if (err) {
+       console.error(err.message);
+     }
+     if(row){
+       res.json({files:row});
+     }
+
+  });
+  
 
 });
 app.get('/verifyaccount', (req, res) => {
@@ -391,7 +413,7 @@ app.listen(port, () => console.log(`App listening on port ${port}!`));
 
 
 //opens db and extracts nessessary data for file upload
-var fileAdd = function(files,prog = false,progname = ""){
+var fileAdd = function(files,prog = false,progname = "",public = "true"){
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -409,7 +431,7 @@ var fileAdd = function(files,prog = false,progname = ""){
   } else {
     name = progname;
   }
-  fileInsert(db,name,extension,filepath);
+  fileInsert(db,name,extension,filepath,public);
 }
 
 //sets actual location of uploaded file
@@ -448,7 +470,7 @@ var filesInsert = function(db,name,extension,version,id ){
 }
 
 //inserts file into NEW project
-var fileInsert = function(db,name,extension,filepath){
+var fileInsert = function(db,name,extension,filepath,public){
 
   db.get(`select id,version from projects where name = ? and account_id = ? `,[name, globalReq.session.account],
      (err, row) => {
@@ -462,7 +484,13 @@ var fileInsert = function(db,name,extension,filepath){
     filesInsert(db, name,extension,version,id);
     filePather(version,id,filepath,extension);
   } else {
-    db.run('insert into projects(name,version,account_id) values(?,?,?)',[name,0,globalReq.session.account], function(err) {
+    console.log(public);
+    if(public == "yes"){
+      p = 1;
+    } else {
+      p = 0;
+    }
+    db.run('insert into projects(name,version,account_id,public) values(?,?,?,?)',[name,0,globalReq.session.account,p], function(err) {
       if (err) {console.error("vsause error here:",err.message);}
       version = 0;
       db.get(`select id from projects where name = ?  and account_id = ?`,[name, globalReq.session.account],
@@ -484,9 +512,9 @@ var fileInsert = function(db,name,extension,filepath){
 
 var fileReader = function(filename,req,res){
   const result = browser(req.headers['user-agent']);
-  console.log(result);
+  //console.log(result);
   if(result.name == "chrome" && filename.indexOf("galibrary") >= 0){
-    console.log(result);
+    //console.log(result);
       filename = "./templates/chrome" + filename;
       fs.readFile(filename, function(err, data) {
       //simple log and console output
