@@ -8,18 +8,18 @@ Art Version Control System One is website that acts as a version control system 
 ##Screenshots
 
 ![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot1-homepagedefault.png "Screenshot1")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot2-signup.png "Screenshot2")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot3-signin.png "Screenshot3")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot4-mylibrary.png "Screenshot4")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot5-libraryswitcher.png "Screenshot5")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot6-publiclibrarysignedin.png "Screenshot6")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot7-createnewproject.png "Screenshot7")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot8-detailedviewsignedin.png "Screenshot8")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot9-viewoptionswitcher.png "Screenshot9")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot10-deleteversion.png "Screenshot10")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot11-deleteproject.png "Screenshot11")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot12-search.png "Screenshot12")
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/tree/master/screenshots/Screenshot13-notsignedindetails.png "Screenshot13")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot2-signup.png "Screenshot2")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot3-signin.png "Screenshot3")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot4-mylibrary.png "Screenshot4")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot5-libraryswitcher.png "Screenshot5")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot6-publiclibrarysignedin.png "Screenshot6")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot7-createnewproject.png "Screenshot7")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot8-detailedviewsignedin.png "Screenshot8")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot9-viewoptionswitcher.png "Screenshot9")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot10-deleteversion.png "Screenshot10")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot11-deleteproject.png "Screenshot11")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot12-search.png "Screenshot12")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot13-notsignedindetails.png "Screenshot13")
 
 
 ## Current Limitations:
