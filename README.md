@@ -2,21 +2,28 @@
 Art Version Control System One is website that acts as a version control system for photoshop and image files. Once signed in to their account, the user can create new projects and upload files to their projects in order to create a back ups of the current version of their projects. New projects can be created as public or private projects. If a project is public it will be viewable to all users on the "Public Library" page. If a project is private then it will only show up in the user's "My Library" page once signed in. As the user continues to work on their project they upload the project's file when they have made progress that they want to back up to there AVCS project. The user can then view each version of each project, download and delete any version they desire. Only the user that created the project can upload new version, delete versions, or delete the entire project. All users are able to download and view each project. This system allows the user to see the progression of their project and also easily revert back to a pervious version of their project.
 
 ## Details
+
+### Website:
+http://www.artvcs.com
+
 ### Dependencies:
   ```Node.js version 10.13.0```
+  ```sqlite3 version 6.4.1```
 
 ### Technologies:
-Backend:
+Back-end:
  - Node.js with Express Server
  - sqlite3 database
-Frontend:
- - HTML, Javascript, CSS
- - Uikit
+
+Front-end:
+ - HTML, JavaScript, CSS
+ - Uikit front-end framework
+
 Hosting:
  - Managed by PM2
  - Nginx Reverse Proxy Server
 
-## Current Limitations:
+### Current Limitations:
  - On current hosting service only files less than 600KB recommended. This is a limitation set by the memory size of said hosting service.
 
 ## Screenshots
@@ -52,8 +59,7 @@ Hosting:
 
 ## Future Plans
 In Future I would like to implement functionality such as:
-  - support for multiple accounts
-  - project deletion
-  - version deletion
-  - multi file versions
   - hosted
+  - set up hosting service with more memory to handle larger files
+  - implement new viewing options
+  - create a version difference indicator
