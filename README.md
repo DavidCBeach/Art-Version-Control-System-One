@@ -5,10 +5,19 @@ Art Version Control System One is website that acts as a version control system 
 ### Dependencies:
   ```Node.js version 10.13.0```
 
-### Technologies
+### Technologies:
+Backend:
+ - Node.js with Express Server
+ - sqlite3 database
+Frontend:
+ - HTML, Javascript, CSS
+ - Uikit
+Hosting:
+ - Managed by PM2
+ - Nginx Reverse Proxy Server
 
-
-
+## Current Limitations:
+ - On current hosting service only files less than 600KB recommended. This is a limitation set by the memory size of said hosting service.
 
 ## Screenshots
 
@@ -40,8 +49,7 @@ Art Version Control System One is website that acts as a version control system 
 ![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot13-notsignedindetails.png "Screenshot13")
 
 
-## Current Limitations:
-  -
+
 ## Future Plans
 In Future I would like to implement functionality such as:
   - support for multiple accounts
