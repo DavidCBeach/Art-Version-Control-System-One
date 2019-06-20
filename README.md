@@ -13,7 +13,7 @@ Art Version Control System One is website that acts as a version control system 
 ## Screenshots
 
 ### Default Home Page (Public Library)
-![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot1-homepagedefault.png "Screenshot1")
+![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot1-homepagedefault.png =250x "Screenshot1")
 ### Sign up - Account Creation
 ![alt text](https://raw.githubusercontent.com/TheUzbekistan/Art-Version-Control-System-One/master/screenshots/Screenshot2-signup.png "Screenshot2")
 ### Sign in
