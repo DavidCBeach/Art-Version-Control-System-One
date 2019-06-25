@@ -1,15 +1,13 @@
 const browser = require('browser-detect');
 var fs = require('fs');
-var dt = require("./custom_modules/dategetter");
+var dt = require("./../custom_modules/dategetter");
 
 
 
-var fileReader = function(filename,req,res){
+exports.fileReader = function(filename,req,res){
   const result = browser(req.headers['user-agent']);
-  //console.log(result);
   if(result.name == "chrome" && filename.indexOf("galibrary") >= 0){
-    //console.log(result);
-      filename = "./../templates/chrome" + filename;
+      filename = "./templates/chrome" + filename;
       fs.readFile(filename, function(err, data) {
       //simple log and console output
       if (err) {
@@ -27,7 +25,7 @@ var fileReader = function(filename,req,res){
       return res.end();
       });
   } else {
-      filename = "./../templates" + filename;
+      filename = "./templates" + filename;
       fs.readFile(filename, function(err, data) {
       //simple log and console output
       if (err) {
@@ -45,6 +43,4 @@ var fileReader = function(filename,req,res){
       return res.end();
       });
   }
-
-
-  }
+}

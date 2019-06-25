@@ -1,17 +1,19 @@
-var dt = require("./custom_modules/dategetter")
+var dt = require("./../custom_modules/dategetter")
 const sqlite3 = require("sqlite3").verbose();
 var fs = require('fs');
 var PSD = require('psd');
+var fileReader = require('./fileReader');
+var session = require('express-session')
 
-let globalReq;
-let globalRes;
+;
 //opens db and extracts nessessary data for file upload
-var fileAdd = function(files,prog = false,progname = "",public = "true",req,res){
+exports.fileAdd = function(files,req,res,sessionaccount,prog = false,progname = "",public = "true"){
   globalReq = req;
   globalRes = res;
+  sessionAccount = sessionaccount;
   var filename  = files.filetoupload.name;
   var filepath = files.filetoupload.path;
-  let db = new sqlite3.Database('./../db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
+  let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
@@ -31,18 +33,18 @@ var fileAdd = function(files,prog = false,progname = "",public = "true",req,res)
 
 //sets actual location of uploaded file
 var filePather = function(version,id,oldpath,extension){
-  var newpath = './../public/files/' + id + '/'+version +'.'+extension;
-  var dir = './../public/files/' + id;
+  var newpath = './public/files/' + id + '/'+version +'.'+extension;
+  var dir = './public/files/' + id;
   if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
   }
   fs.rename(oldpath, newpath, function (err) {
     if (err) throw err;
     if(extension == "psd"){
-      fileConverter('./../public/files/' + id + '/'+version);
+      fileConverter('./public/files/' + id + '/'+version);
     }
     //TODO: galibrary upload returns to galibrary
-    fileReader("/library.html",globalReq,globalRes);
+    fileReader.fileReader("/library.html",globalReq,globalRes);
   });
 }
 
@@ -67,7 +69,7 @@ var filesInsert = function(db,name,extension,version,id ){
 //inserts file into NEW project
 var fileInsert = function(db,name,extension,filepath,public){
 
-  db.get(`select id,version from projects where name = ? and account_id = ? `,[name, globalReq.session.account],
+  db.get(`select id,version from projects where name = ? and account_id = ? `,[name, sessionAccount],
      (err, row) => {
      if (err) {
        console.error("vsause error here:",err.message);
@@ -85,10 +87,10 @@ var fileInsert = function(db,name,extension,filepath,public){
     } else {
       p = 0;
     }
-    db.run('insert into projects(name,version,account_id,public) values(?,?,?,?)',[name,0,globalReq.session.account,p], function(err) {
+    db.run('insert into projects(name,version,account_id,public) values(?,?,?,?)',[name,0,sessionAccount,p], function(err) {
       if (err) {console.error("vsause error here:",err.message);}
       version = 0;
-      db.get(`select id from projects where name = ?  and account_id = ?`,[name, globalReq.session.account],
+      db.get(`select id from projects where name = ?  and account_id = ?`,[name, sessionAccount],
          (err, row) => {
          if (err) {
            console.error("vsause error here:",err.message);

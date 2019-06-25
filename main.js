@@ -6,8 +6,8 @@ var routes = require('./routes');
 
 
 algorithm = 'aes-256-ctr';
-password = encryptpass.password();
-var PSD = require('psd');
+
+
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('trust proxy', 1) // trust first proxy
@@ -26,10 +26,8 @@ app.use(session({
 //Multiple files with same version number for project with multiple files
 //allow project names to contain spaces
 //card view mode for library and galibrary
-//public profile
 
 //req TODO
-//search function
 //handle names with '-'  for file upload from galibrary
 
 

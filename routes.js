@@ -3,7 +3,7 @@ var router = express.Router();
 var url = require('url');
 var fs = require('fs');
 var formidable = require('formidable');
-
+const sqlite3 = require("sqlite3").verbose();
 var encrypt = require('./functions/encrypt');
 var fileManager = require('./functions/fileManager');
 var fileReader = require('./functions/fileReader');
@@ -13,7 +13,7 @@ var fileReader = require('./functions/fileReader');
 router.post('/fileupload', (req, res) => {
   var form = new formidable.IncomingForm();
   form.parse(req, function (err, fields, files) {
-    fileManager.fileAdd(files,req,res);
+    fileManager.fileAdd(files,req,res,req.session.account);
   });
 });
 
@@ -46,18 +46,9 @@ router.post('/deletefile', (req, res) => {
               res.redirect(req.get('referer'));
           });
         }
+      });
 });
-// console.log(id);
-// console.log(version);
-// db.all(`select id, name, version as project_version, account_id from projects`, (err, row) =>{
-//         console.log(row);
-//
-//          });
-// db.all(`select * from (select * from ( select id as projects_id, name, version as project_version, account_id from projects), files where projects_id = files.project_id) where id = ?`,[id], (err, row) =>{
-//         console.log(row);
-//
-//          });
-});
+
 router.post('/deleteproject', (req, res) => {
   var id = req.body.id;
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -77,7 +68,7 @@ router.post('/progupload', (req, res) => {
   form.parse(req, function (err, fields, files) {
     if((files.filetoupload.name && fields.progname)&&(!fields.progname.includes(" "))){
       console.log(fields);
-      fileManager.fileAdd(files,true,fields.progname,fields.public,req,res);
+      fileManager.fileAdd(files,req,res,req.session.account,true,fields.progname,fields.public);
     } else {
       fileReader.fileReader("/library.html",req,res);
     }
@@ -109,13 +100,13 @@ router.post('/signin', (req, res) => {
        req.session.save(function(err) {
           // session saved
         })
-
-  }
-  });
+      }
+    });
 
   });
   fileReader.fileReader("/library.html",req,res);
 });
+
 router.post('/signup', (req, res) => {
   console.log("signup");
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -135,31 +126,29 @@ router.post('/signup', (req, res) => {
      }
      if (row) {
 
-  } else {
-    db.run('insert into accounts(username,password) values(?,?)',[username,password], function(err) {
+     } else {
+      db.run('insert into accounts(username,password) values(?,?)',[username,password], function(err) {
       if (err) {console.error("vsause error here:",err.message);}
-      console.log("user added");
-      db.get(`select * from accounts where username = ? `,[username],
+        console.log("user added");
+        db.get(`select * from accounts where username = ? `,[username],
          (err, row) => {
-         if (err) {
-           console.error("vsause error here:",err.message);
-         }
-         if (!row) {
+            if (err) {
+              console.error("vsause error here:",err.message);
+            }
+            if (!row) {
+                console.log("signed in");
+                req.session.account = row.id;
+                req.session.save(function(err) {
+                // session saved
+              });
+            }
+          });
+        });
+      }
 
-
-      console.log("signed in");
-      req.session.account = row.id;
-      req.session.save(function(err) {
-         // session saved
-       });
-     }
-     });
-});
-}
-
-  fileReader.fileReader("/library.html",req,res);
-});
-});
+      fileReader.fileReader("/library.html",req,res);
+    });
+  });
 });
 router.use(express.static('public'));
 
@@ -200,11 +189,10 @@ router.get('/getlatest', (req, res) => {
      if(row){
        res.json({files:row});
      }
-
-  });
+   });
   }
-
 });
+
 router.get('/getlatestpublic', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
@@ -212,7 +200,6 @@ router.get('/getlatestpublic', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-
     db.all(`select * from (select * from (select * from projects, files where projects.id = files.project_id and projects.version = files.version), accounts where accounts.id = account_id) where public = 1`,
      (err, rows) => {
      if (err) {
@@ -221,13 +208,8 @@ router.get('/getlatestpublic', (req, res) => {
      if(rows){
        res.json({files:rows});
      }
-
   });
-
-
 });
-
-
 
 router.get('/verifyaccount', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
@@ -236,7 +218,6 @@ router.get('/verifyaccount', (req, res) => {
     }
     console.log('Connected to the in-memory SQlite database.');
   });
-
        db.get(`select * from projects where id = ? and account_id = ?`,[req.query.id,req.session.account],
           (err, row) => {
           if (err) {
@@ -248,30 +229,25 @@ router.get('/verifyaccount', (req, res) => {
        } else {
          res.json({verification: false});
        }
-
-
      });
-
-
-
 });
+
 router.get('/getaccount', (req, res) => {
   res.json({account:req.session.account});
-
-
-
 });
+
 router.get('/signout', (req, res) => {
     req.session.account = -1;
     res.redirect("library.html");
 });
+
 router.get('/getinfo', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
       return console.error(err.message);
     }
-    console.log('Connected to the in-memory SQlite database.');
-  });
+      console.log('Connected to the in-memory SQlite database.');
+    });
     db.all(`select * from files where project_id = ? order by version desc`,[req.query.file],
      (err, row) => {
      if (err) {
@@ -285,13 +261,10 @@ router.get('/getinfo', (req, res) => {
           if (row2) {
 
             res.json({info:row,name:row2["name"]});
-       }
-
-
-     });
-
-  }
-});
+          }
+        });
+      }
+    });
 });
 
 router.get('/getfolders', (req, res) => {
@@ -337,6 +310,7 @@ router.get('/sqlprojects', (req, res) => {
      res.json({files: row})
   });
 });
+
 router.get('/sqlaccounts', (req, res) => {
   let db = new sqlite3.Database('./db/filedb2.sl3',sqlite3.OPEN_READWRITE, (err) => {
     if (err) {
