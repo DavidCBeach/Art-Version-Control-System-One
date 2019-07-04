@@ -4,7 +4,7 @@ Art Version Control System One is website that acts as a version control system 
 ## Details
 
 ### Website:
-http://www.artvcs.com
+https://www.artvcs.com/
 
 ### Dependencies:
   ```Node.js version 10.13.0```
