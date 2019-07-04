@@ -1,3 +1,4 @@
+<!doctype html>
 <head>
   <meta charset="UTF-8">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -108,6 +109,7 @@
     <div id= "topspacer"></div>
     <ul  id="versions" class= "uk-list uk-list-striped versions"></ul>
   </div>
+  <div id="modal-delete-version" uk-modal></div>
 </body>
 
 
@@ -185,11 +187,14 @@ $.get("/getinfo?file="+folder).done(function(data){
     var list3 = "<span class='infotitle'>Date Uploaded: </span><span>"+date+"</span><br><br>";
     var nsdate = date.toString().split(" ").join("");
     var list4 = "<button class='uk-button uk-button-default' onclick=downloadFile('"+path+info[i]["extension"]+"','"+folder+"','.v"+info[i]["version"]+".d"+nsdate+"."+info[i]["extension"]+"')>DOWNLOAD</button>"
-    var list5 =  '<button class="uk-button uk-button-danger uk-margin-small-right deleteButton" type="button" uk-toggle="target: #modal-delete-version" >Delete</button><div id="modal-delete-version" uk-modal><div class="uk-modal-dialog uk-modal-body"><button class="uk-modal-close-default" type="button" uk-close></button><h2 class="uk-modal-title">Delete Verson</h2><p> WARNING: This will delete this version perminately from your project.</p>  <button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteFile('+info[i]["version"]+','+info[i]["id"]+')" type="button" >Delete</button></div></div>';
+    var list5 =  '<button class="uk-button uk-button-danger uk-margin-small-right deleteButton" type="button" uk-toggle="target: #modal-delete-version" onclick="setModal('+info[i]["version"]+','+info[i]["id"]+')">Delete</button></div>';
     $("#versions").append(list1+list2+list3+list4+list5);
   }
 });
-
+function setModal(version, id){
+  var content = '<div class="uk-modal-dialog uk-modal-body"><button class="uk-modal-close-default" type="button" uk-close></button><h2 class="uk-modal-title">Delete Verson</h2><p> WARNING: This will delete this version perminately from your project.</p>  <button class="uk-button uk-button-danger uk-margin-small-right" onclick="deleteFile('+version+','+id+')" type="button" >Delete</button>'
+  $("#modal-delete-version").append(content);
+}
 $.get("/getaccount").done(function(data){
   if(data.account != -1 && data.account){
     console.log(data);
