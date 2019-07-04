@@ -105,7 +105,6 @@ Here's how it looks when a user clicks on a project from the Public Library. The
 
 ## Future Plans
 In Future I would like to implement functionality such as:
-  - hosted
   - set up hosting service with more memory to handle larger files
   - implement new viewing options
   - create a version difference indicator
